@@ -79,15 +79,7 @@ export function SupabaseSignInView() {
       <Field.Text name="email" label="Email address" slotProps={{ inputLabel: { shrink: true } }} />
 
       <Box sx={{ gap: 1.5, display: 'flex', flexDirection: 'column' }}>
-        <Link
-          component={RouterLink}
-          href={paths.auth.supabase.resetPassword}
-          variant="body2"
-          color="inherit"
-          sx={{ alignSelf: 'flex-end' }}
-        >
-          Forgot password?
-        </Link>
+        
 
         <Field.Text
           name="password"
@@ -109,6 +101,16 @@ export function SupabaseSignInView() {
             },
           }}
         />
+
+        <Link
+          component={RouterLink}
+          href={paths.auth.supabase.resetPassword}
+          variant="body2"
+          color="inherit"
+          sx={{ alignSelf: 'flex-end' }}
+        >
+          비밀번호 찾기
+        </Link>
       </Box>
 
       <Button
@@ -120,25 +122,14 @@ export function SupabaseSignInView() {
         loading={isSubmitting}
         loadingIndicator="Sign in..."
       >
-        Sign in
+        로그인
       </Button>
     </Box>
   );
 
   return (
     <>
-      <FormHead
-        title="Sign in to your account"
-        description={
-          <>
-            {`Don’t have an account? `}
-            <Link component={RouterLink} href={paths.auth.supabase.signUp} variant="subtitle2">
-              Get started
-            </Link>
-          </>
-        }
-        sx={{ textAlign: { xs: 'center', md: 'left' } }}
-      />
+      
 
       {!!errorMessage && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -149,6 +140,18 @@ export function SupabaseSignInView() {
       <Form methods={methods} onSubmit={onSubmit}>
         {renderForm()}
       </Form>
+      <FormHead
+       //title="Sign in to your account"
+        description={
+          <>
+            {`처음 방문하셨나요? `}
+            <Link component={RouterLink} href={paths.auth.supabase.signUp} variant="subtitle2">
+              회원 가입
+            </Link>
+          </>
+        }
+        sx={{ textAlign: { xs: 'center', md: 'left' } }}
+      />
     </>
   );
 }
