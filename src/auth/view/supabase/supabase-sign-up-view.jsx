@@ -1,8 +1,8 @@
 'use client';
 
 import * as z from 'zod';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState, useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -28,14 +28,24 @@ import { SignUpTerms } from '../../components/sign-up-terms';
 // ----------------------------------------------------------------------
 
 export const SignUpSchema = z.object({
-  firstName: z.string().min(1, { error: 'First name is required!' }),
-  lastName: z.string().min(1, { error: 'Last name is required!' }),
+  userName: z.string().min(1, { error: '이름을 입력하세요!' }),
   email: schemaUtils.email(),
   password: z
     .string()
-    .min(1, { error: 'Password is required!' })
-    .min(6, { error: 'Password must be at least 6 characters!' }),
-});
+    .min(1, { error: '비밀번호를 입력하세요!' })
+    .min(8, { error: '비밀번호는 최소 8자 이상이어야 합니다!' }),
+  passwordCheck: z
+    .string()
+    .min(1, { error: '비밀번호 확인을 입력하세요!' }),
+}).refine(
+  (d) => {
+    // 둘 다 비어있거나 하나라도 비어있으면 ‘일치’ 검사는 패스(= 에러 내지 않음)
+    if (d.password === '' || d.passwordCheck === '') return true;
+    // 둘 다 값이 있을 때만 일치 여부 검사
+    return d.password === d.passwordCheck;
+  },
+  { path: ['passwordCheck'], message: '비밀번호가 일치하지 않습니다.' }
+);
 
 // ----------------------------------------------------------------------
 
@@ -47,16 +57,39 @@ export function SupabaseSignUpView() {
   const [errorMessage, setErrorMessage] = useState(null);
 
   const defaultValues = {
-    firstName: '',
-    lastName: '',
+    userName: '',
     email: '',
     password: '',
+    passwordCheck: '',
   };
 
   const methods = useForm({
     resolver: zodResolver(SignUpSchema),
     defaultValues,
+    mode: 'onSubmit',        // ✅ 전역은 제출 시 검증
+    reValidateMode: 'onSubmit',
   });
+
+  const {
+  control,
+  trigger,
+  formState: { touchedFields, dirtyFields },
+} = methods;
+
+  // 비밀번호, 비밀번호 확인 값 입력시 실시간 체크 로직 Start
+  const pw  = useWatch({ control, name: 'password' });
+  const pwc = useWatch({ control, name: 'passwordCheck' });
+
+  useEffect(() => {
+    // ❶ 두 필드 중 하나라도 ‘입력 상호작용’이 있었고
+    const interacted = dirtyFields.password || dirtyFields.passwordCheck || touchedFields.password || touchedFields.passwordCheck;
+
+    // ❷ 두 칸 모두 값이 있을 때만(= 일치검사 의미가 있을 때만) 재검증
+    if (interacted && pw !== '' && pwc !== '') {
+      void trigger('passwordCheck');    // passwordCheck만 재검증 → 다른 필드엔 영향 X
+    }
+  }, [pw, pwc, dirtyFields.password, dirtyFields.passwordCheck, touchedFields.password, touchedFields.passwordCheck, trigger]);
+  // 비밀번호, 비밀번호 확인 값 입력시 실시간 체크 로직 End  
 
   const {
     handleSubmit,
@@ -65,14 +98,19 @@ export function SupabaseSignUpView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
+      // (이중 방어) 제출 직전에 한 번 더 확인
+      if (data.password !== data.passwordCheck) {
+        setErrorMessage('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+
       await signUp({
         email: data.email,
         password: data.password,
-        firstName: data.firstName,
-        lastName: data.lastName,
+        userName: data.userName,
       });
-
-      router.push(paths.auth.supabase.verify);
+      
+      router.push(paths.auth.supabase.verify); // 회원가입 클릭후 이동할 화면페이지
     } catch (error) {
       console.error(error);
       const feedbackMessage = getErrorMessage(error);
@@ -86,23 +124,18 @@ export function SupabaseSignUpView() {
         sx={{ display: 'flex', gap: { xs: 3, sm: 2 }, flexDirection: { xs: 'column', sm: 'row' } }}
       >
         <Field.Text
-          name="firstName"
-          label="First name"
-          slotProps={{ inputLabel: { shrink: true } }}
-        />
-        <Field.Text
-          name="lastName"
-          label="Last name"
+          name="userName"
+          label="이름"
           slotProps={{ inputLabel: { shrink: true } }}
         />
       </Box>
 
-      <Field.Text name="email" label="Email address" slotProps={{ inputLabel: { shrink: true } }} />
+      <Field.Text name="email" label="Email" slotProps={{ inputLabel: { shrink: true } }} />
 
       <Field.Text
         name="password"
-        label="Password"
-        placeholder="6+ characters"
+        label="비밀번호"
+        //placeholder="6+ characters"
         type={showPassword.value ? 'text' : 'password'}
         slotProps={{
           inputLabel: { shrink: true },
@@ -118,6 +151,28 @@ export function SupabaseSignUpView() {
         }}
       />
 
+      <Field.Text
+        name="passwordCheck"
+        label="비밀번호 확인"
+        //placeholder="6+ characters"
+        type={showPassword.value ? 'text' : 'password'}
+        slotProps={{
+          inputLabel: { shrink: true },
+          
+          /*
+          input: {
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={showPassword.onToggle} edge="end">
+                  <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                </IconButton>
+              </InputAdornment>
+            ),
+          },
+          */
+        }}
+      />
+
       <Button
         fullWidth
         color="inherit"
@@ -127,25 +182,14 @@ export function SupabaseSignUpView() {
         loading={isSubmitting}
         loadingIndicator="Create account..."
       >
-        Create account
+        회원 가입
       </Button>
     </Box>
   );
 
   return (
     <>
-      <FormHead
-        title="Get started absolutely free"
-        description={
-          <>
-            {`Already have an account? `}
-            <Link component={RouterLink} href={paths.auth.supabase.signIn} variant="subtitle2">
-              Get started
-            </Link>
-          </>
-        }
-        sx={{ textAlign: { xs: 'center', md: 'left' } }}
-      />
+      
 
       {!!errorMessage && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -157,7 +201,20 @@ export function SupabaseSignUpView() {
         {renderForm()}
       </Form>
 
-      <SignUpTerms />
+      <FormHead
+        //title="Get started absolutely free"
+        description={
+          <>
+            {`이미 계정이 있으신가요? `}
+            <Link component={RouterLink} href={paths.auth.supabase.signIn} variant="subtitle2">
+              로그인
+            </Link>
+          </>
+        }
+        sx={{ textAlign: { xs: 'center', md: 'left' } }}
+      />
+
+      {/* <SignUpTerms /> */}
     </>
   );
 }

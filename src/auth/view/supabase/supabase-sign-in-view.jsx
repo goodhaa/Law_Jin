@@ -31,8 +31,8 @@ export const SignInSchema = z.object({
   email: schemaUtils.email(),
   password: z
     .string()
-    .min(1, { error: 'Password is required!' })
-    .min(6, { error: 'Password must be at least 6 characters!' }),
+    .min(1, { error: '비밀번호를 입력하세요!' })
+    .min(8, { error: '비밀번호는 최소 8자 이상이어야 합니다!' }),
 });
 
 // ----------------------------------------------------------------------
@@ -76,15 +76,15 @@ export function SupabaseSignInView() {
 
   const renderForm = () => (
     <Box sx={{ gap: 3, display: 'flex', flexDirection: 'column' }}>
-      <Field.Text name="email" label="Email address" slotProps={{ inputLabel: { shrink: true } }} />
+      <Field.Text name="email" label="Email" slotProps={{ inputLabel: { shrink: true } }} />
 
       <Box sx={{ gap: 1.5, display: 'flex', flexDirection: 'column' }}>
         
 
         <Field.Text
           name="password"
-          label="Password"
-          placeholder="6+ characters"
+          label="비밀번호"
+          //placeholder="6+ characters"
           type={showPassword.value ? 'text' : 'password'}
           slotProps={{
             inputLabel: { shrink: true },

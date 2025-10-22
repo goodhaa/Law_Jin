@@ -7,7 +7,7 @@ import { supabase } from 'src/lib/supabase';
 // ----------------------------------------------------------------------
 
 /** **************************************
- * Sign in
+ * 로그인
  *************************************** */
 export const signInWithPassword = async ({ email, password }) => {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -21,15 +21,15 @@ export const signInWithPassword = async ({ email, password }) => {
 };
 
 /** **************************************
- * Sign up
+ * 회원가입
  *************************************** */
-export const signUp = async ({ email, password, firstName, lastName }) => {
+export const signUp = async ({ email, password, userName }) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: `${window.location.origin}${paths.dashboard.root}`,
-      data: { display_name: `${firstName} ${lastName}` },
+      data: { display_name: `${userName}` },
     },
   });
 
@@ -39,7 +39,7 @@ export const signUp = async ({ email, password, firstName, lastName }) => {
   }
 
   if (!data?.user?.identities?.length) {
-    throw new Error('This user already exists');
+    throw new Error('사용자가 이미 존재합니다.');
   }
 
   return { data, error };

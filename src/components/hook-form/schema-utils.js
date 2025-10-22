@@ -24,8 +24,8 @@ export const schemaUtils = {
     z.email({
       error: ({ input, code }) =>
         input && code.startsWith('invalid')
-          ? (props?.error?.invalid ?? 'Email must be a valid email address!')
-          : (props?.error?.required ?? 'Email is required!'),
+          ? (props?.error?.invalid ?? '올바른 Email 형식이 아닙니다.')
+          : (props?.error?.required ?? 'Email을 입력하세요'),
     }),
 
   /**
