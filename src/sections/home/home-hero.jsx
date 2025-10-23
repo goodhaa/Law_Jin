@@ -73,9 +73,9 @@ export function HomeHero({ sx, ...other }) {
         ]}
       >
         <Box component="span" sx={{ width: 1, opacity: 0.24 }}>
-          Boost your building
+          법률의 복잡함을 단순하게
         </Box>
-        process with
+        당신의 업무는 오직
         <Box
           component={m.span}
           animate={{ backgroundPosition: '200% center' }}
@@ -95,8 +95,9 @@ export function HomeHero({ sx, ...other }) {
             }),
           ]}
         >
-          Minimal
+          '변호'
         </Box>
+        에 집중
       </Box>
     </m.div>
   );
@@ -113,7 +114,8 @@ export function HomeHero({ sx, ...other }) {
           }),
         ]}
       >
-        {`The starting point for your next project is based on MUI. \nEasy customization helps you build apps faster and better.`}
+        {`사건 관리부터 일정, 문서, 고객까지\n
+          당신의 로펌을 하나로 연결하는 Smart Legal Solution`}
       </Typography>
     </m.div>
   );
@@ -316,11 +318,12 @@ export function HomeHero({ sx, ...other }) {
             <m.div style={{ y: y2 }}>{renderText()}</m.div>
           </Stack>
 
+          {/*
           <m.div style={{ y: y3 }}>{renderRatings()}</m.div>
           <m.div style={{ y: y4 }}>{renderButtons()}</m.div>
           <m.div style={{ y: y5 }}>{renderIcons()}</m.div>
+          */}
         </Container>
-
         <HeroBackground />
       </Box>
     </Box>

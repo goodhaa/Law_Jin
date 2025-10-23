@@ -34,6 +34,7 @@ export function HomeView() {
 
       <HomeHero />
 
+      {/*
       <Stack sx={{ position: 'relative', bgcolor: 'background.default' }}>
         <HomeMinimal />
 
@@ -55,6 +56,7 @@ export function HomeView() {
 
         <HomeAdvertisement />
       </Stack>
+      */}
     </>
   );
 }
