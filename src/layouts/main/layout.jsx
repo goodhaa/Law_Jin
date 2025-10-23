@@ -70,7 +70,7 @@ export function MainLayout({ sx, cssVars, children, slotProps, layoutQuery = 'md
             {/** @slot Settings button */}
             <SettingsButton />
 
-            {/** @slot Sign in button */}
+            {/** @slot 로그인 버튼 */}
             <SignInButton />
 
             {/** @slot Purchase button */}

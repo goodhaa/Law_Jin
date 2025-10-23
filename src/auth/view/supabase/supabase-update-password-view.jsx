@@ -30,12 +30,12 @@ export const UpdatePasswordSchema = z
   .object({
     password: z
       .string()
-      .min(1, { error: 'Password is required!' })
-      .min(6, { error: 'Password must be at least 6 characters!' }),
-    confirmPassword: z.string().min(1, { error: 'Confirm password is required!' }),
+      .min(1, { error: '비밀번호를 입력하세요!' })
+      .min(8, { error: '비밀번호는 최소 8자 이상이어야 합니다!' }),
+    confirmPassword: z.string().min(1, { error: '비밀번호 확인을 입력하세요!' }),
   })
   .refine((val) => val.password === val.confirmPassword, {
-    error: 'Passwords do not match!',
+    error: '비밀번호가 일치하지 않습니다.',
     path: ['confirmPassword'],
   });
 
@@ -79,8 +79,8 @@ export function SupabaseUpdatePasswordView() {
     <Box sx={{ gap: 3, display: 'flex', flexDirection: 'column' }}>
       <Field.Text
         name="password"
-        label="Password"
-        placeholder="6+ characters"
+        label="비밀번호"
+        //placeholder="6+ characters"
         type={showPassword.value ? 'text' : 'password'}
         slotProps={{
           inputLabel: { shrink: true },
@@ -98,19 +98,11 @@ export function SupabaseUpdatePasswordView() {
 
       <Field.Text
         name="confirmPassword"
-        label="Confirm password"
+        label="비밀번호 확인"
         type={showPassword.value ? 'text' : 'password'}
         slotProps={{
           inputLabel: { shrink: true },
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={showPassword.onToggle} edge="end">
-                  <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
+          
         }}
       />
 
@@ -122,7 +114,7 @@ export function SupabaseUpdatePasswordView() {
         loading={isSubmitting}
         loadingIndicator="Update password..."
       >
-        Update password
+        비밀번호 변경
       </Button>
     </Box>
   );
@@ -131,8 +123,10 @@ export function SupabaseUpdatePasswordView() {
     <>
       <FormHead
         icon={<NewPasswordIcon />}
-        title="Update password"
+        /*
+        title="비밀번호 변경"
         description="Successful updates enable access using the new password."
+        */
       />
 
       {!!errorMessage && (
