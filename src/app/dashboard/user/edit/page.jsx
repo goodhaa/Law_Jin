@@ -11,7 +11,7 @@ export default async function Page({ params }) {
   const { id } = await params;
 
   const currentUser = _userList.find((user) => user.id === id);
-
+  
   return <UserEditView user={currentUser} />;
 }
 

@@ -1,4 +1,4 @@
-export * from './user-edit-view';
+export * from './userEditView';
 
 export * from './user-list-view';
 

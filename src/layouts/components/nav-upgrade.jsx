@@ -26,6 +26,8 @@ export function NavUpgrade({ sx, ...other }) {
     >
       <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box sx={{ position: 'relative' }}>
+
+          {/* 사용자 사진 */}
           <Avatar src={user?.photoURL} alt={user?.displayName} sx={{ width: 48, height: 48 }}>
             {user?.displayName?.charAt(0).toUpperCase()}
           </Avatar>
@@ -46,6 +48,7 @@ export function NavUpgrade({ sx, ...other }) {
           </Label>
         </Box>
 
+        {/** 사용자 이름/이메일 */}
         <Box sx={{ mb: 2, mt: 1.5, width: 1 }}>
           <Typography
             variant="subtitle2"
@@ -64,6 +67,7 @@ export function NavUpgrade({ sx, ...other }) {
           </Typography>
         </Box>
 
+        {/*    
         <Button
           variant="contained"
           href={paths.minimalStore}
@@ -72,6 +76,7 @@ export function NavUpgrade({ sx, ...other }) {
         >
           Upgrade to Pro
         </Button>
+        */}
       </Box>
     </Box>
   );

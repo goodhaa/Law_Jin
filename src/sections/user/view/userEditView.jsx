@@ -6,7 +6,7 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
-import { UserCreateEditForm } from '../user-create-edit-form';
+import { UserCreateEditForm } from '../userCreateEditForm';
 
 // ----------------------------------------------------------------------
 
