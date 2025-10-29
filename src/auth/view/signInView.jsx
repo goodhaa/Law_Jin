@@ -20,10 +20,10 @@ import { RouterLink } from 'src/routes/components';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
-import { useAuthContext } from '../../hooks';
-import { getErrorMessage } from '../../utils';
-import { FormHead } from '../../components/form-head';
-import { signInWithPassword } from '../../context/amplify';
+import { useAuthContext } from '../hooks';
+import { getErrorMessage } from '../utils';
+import { FormHead } from '../components/form-head';
+import { signInWithPassword } from '../context/supabase';
 
 // ----------------------------------------------------------------------
 
@@ -31,13 +31,13 @@ export const SignInSchema = z.object({
   email: schemaUtils.email(),
   password: z
     .string()
-    .min(1, { error: 'Password is required!' })
-    .min(6, { error: 'Password must be at least 6 characters!' }),
+    .min(1, { error: '비밀번호를 입력하세요!' })
+    .min(8, { error: '비밀번호는 최소 8자 이상이어야 합니다!' }),
 });
 
 // ----------------------------------------------------------------------
 
-export function AmplifySignInView() {
+export function SupabaseSignInView() {
   const router = useRouter();
 
   const showPassword = useBoolean();
@@ -63,7 +63,7 @@ export function AmplifySignInView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await signInWithPassword({ username: data.email, password: data.password });
+      await signInWithPassword({ email: data.email, password: data.password });
       await checkUserSession?.();
 
       router.refresh();
@@ -76,23 +76,15 @@ export function AmplifySignInView() {
 
   const renderForm = () => (
     <Box sx={{ gap: 3, display: 'flex', flexDirection: 'column' }}>
-      <Field.Text name="email" label="Email address" slotProps={{ inputLabel: { shrink: true } }} />
+      <Field.Text name="email" label="Email" slotProps={{ inputLabel: { shrink: true } }} />
 
       <Box sx={{ gap: 1.5, display: 'flex', flexDirection: 'column' }}>
-        <Link
-          component={RouterLink}
-          href={paths.auth.amplify.resetPassword}
-          variant="body2"
-          color="inherit"
-          sx={{ alignSelf: 'flex-end' }}
-        >
-          Forgot password?
-        </Link>
+        
 
         <Field.Text
           name="password"
-          label="Password"
-          placeholder="6+ characters"
+          label="비밀번호"
+          //placeholder="6+ characters"
           type={showPassword.value ? 'text' : 'password'}
           slotProps={{
             inputLabel: { shrink: true },
@@ -109,6 +101,16 @@ export function AmplifySignInView() {
             },
           }}
         />
+
+        <Link
+          component={RouterLink}
+          href={paths.auth.supabase.resetPassword}
+          variant="body2"
+          color="inherit"
+          sx={{ alignSelf: 'flex-end' }}
+        >
+          비밀번호 찾기
+        </Link>
       </Box>
 
       <Button
@@ -120,25 +122,14 @@ export function AmplifySignInView() {
         loading={isSubmitting}
         loadingIndicator="Sign in..."
       >
-        Sign in
+        로그인
       </Button>
     </Box>
   );
 
   return (
     <>
-      <FormHead
-        title="Sign in to your account"
-        description={
-          <>
-            {`Don’t have an account? `}
-            <Link component={RouterLink} href={paths.auth.amplify.signUp} variant="subtitle2">
-              Get started
-            </Link>
-          </>
-        }
-        sx={{ textAlign: { xs: 'center', md: 'left' } }}
-      />
+      
 
       {!!errorMessage && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -149,6 +140,18 @@ export function AmplifySignInView() {
       <Form methods={methods} onSubmit={onSubmit}>
         {renderForm()}
       </Form>
+      <FormHead
+       //title="Sign in to your account"
+        description={
+          <>
+            {`처음 방문하셨나요? `}
+            <Link component={RouterLink} href={paths.auth.supabase.signUp} variant="subtitle2">
+              회원 가입
+            </Link>
+          </>
+        }
+        sx={{ textAlign: { xs: 'center', md: 'left' } }}
+      />
     </>
   );
 }

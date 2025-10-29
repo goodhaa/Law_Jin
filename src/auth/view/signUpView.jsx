@@ -20,10 +20,10 @@ import { RouterLink } from 'src/routes/components';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
-import { getErrorMessage } from '../../utils';
-import { signUp } from '../../context/supabase';
-import { FormHead } from '../../components/form-head';
-import { SignUpTerms } from '../../components/sign-up-terms';
+import { getErrorMessage } from '../utils';
+import { signUp } from '../context/supabase';
+import { FormHead } from '../components/form-head';
+import { SignUpTerms } from '../components/sign-up-terms';
 
 // ----------------------------------------------------------------------
 

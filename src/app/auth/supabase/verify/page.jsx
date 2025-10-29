@@ -1,6 +1,6 @@
 import { CONFIG } from 'src/global-config';
 
-import { SupabaseVerifyView } from 'src/auth/view/supabase';
+import { SupabaseVerifyView } from 'src/auth/view';
 
 // ----------------------------------------------------------------------
 

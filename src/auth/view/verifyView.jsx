@@ -4,8 +4,8 @@ import { paths } from 'src/routes/paths';
 
 import { EmailInboxIcon } from 'src/assets/icons';
 
-import { FormHead } from '../../components/form-head';
-import { FormReturnLink } from '../../components/form-return-link';
+import { FormHead } from '../components/form-head';
+import { FormReturnLink } from '../components/form-return-link';
 
 // ----------------------------------------------------------------------
 

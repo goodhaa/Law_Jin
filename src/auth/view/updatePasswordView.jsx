@@ -20,9 +20,9 @@ import { NewPasswordIcon } from 'src/assets/icons';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
-import { getErrorMessage } from '../../utils';
-import { FormHead } from '../../components/form-head';
-import { updatePassword } from '../../context/supabase';
+import { getErrorMessage } from '../utils';
+import { FormHead } from '../components/form-head';
+import { updatePassword } from '../context/supabase';
 
 // ----------------------------------------------------------------------
 
