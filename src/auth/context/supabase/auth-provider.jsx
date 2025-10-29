@@ -4,20 +4,17 @@ import { useSetState } from 'minimal-shared/hooks';
 import { useMemo, useEffect, useCallback } from 'react';
 
 import axios from 'src/lib/axios';
-import { supabase } from 'src/lib/supabase';
+import { getSupabaseBrowser } from 'src/lib/supabase/client';
 
 import { AuthContext } from '../auth-context';
 
 // ----------------------------------------------------------------------
 
-/**
- * NOTE:
- * We only build demo at basic level.
- * Customer will need to do some extra handling yourself if you want to extend the logic and other features...
- */
-
 export function AuthProvider({ children }) {
   const { state, setState } = useSetState({ user: null, loading: true });
+
+  // ✅ 이제 이름 맞춤: getSupabaseBrowser()
+  const supabase = useMemo(() => getSupabaseBrowser(), []);
 
   const checkUserSession = useCallback(async () => {
     try {
@@ -35,27 +32,27 @@ export function AuthProvider({ children }) {
       if (session) {
         const accessToken = session?.access_token;
 
-        setState({ user: { ...session, ...session?.user }, loading: false });
+        setState({
+          user: { ...session, ...session?.user },
+          loading: false,
+        });
+
         axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
       } else {
         setState({ user: null, loading: false });
         delete axios.defaults.headers.common.Authorization;
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setState({ user: null, loading: false });
     }
-  }, [setState]);
+  }, [setState, supabase]);
 
   useEffect(() => {
     checkUserSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // ----------------------------------------------------------------------
+  }, [checkUserSession]);
 
   const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
-
   const status = state.loading ? 'loading' : checkAuthenticated;
 
   const memoizedValue = useMemo(
@@ -65,7 +62,7 @@ export function AuthProvider({ children }) {
             ...state.user,
             id: state.user?.id,
             accessToken: state.user?.access_token,
-            displayName: state.user?.user_metadata.display_name,
+            displayName: state.user?.user_metadata?.display_name,
             role: state.user?.role ?? 'admin',
           }
         : null,
@@ -73,8 +70,11 @@ export function AuthProvider({ children }) {
       loading: status === 'loading',
       authenticated: status === 'authenticated',
       unauthenticated: status === 'unauthenticated',
+
+      // 원하면 context로도 내려줌
+      supabase,
     }),
-    [checkUserSession, state.user, status]
+    [checkUserSession, state.user, status, supabase]
   );
 
   return <AuthContext value={memoizedValue}>{children}</AuthContext>;

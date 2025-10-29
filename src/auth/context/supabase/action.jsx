@@ -1,8 +1,7 @@
 'use client';
 
 import { paths } from 'src/routes/paths';
-
-import { supabase } from 'src/lib/supabase';
+import { getSupabaseBrowser } from 'src/lib/supabase/client';
 
 // ----------------------------------------------------------------------
 
@@ -10,7 +9,12 @@ import { supabase } from 'src/lib/supabase';
  * 로그인
  *************************************** */
 export const signInWithPassword = async ({ email, password }) => {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const supabase = getSupabaseBrowser();
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
   if (error) {
     console.error(error);
@@ -24,6 +28,8 @@ export const signInWithPassword = async ({ email, password }) => {
  * 회원가입
  *************************************** */
 export const signUp = async ({ email, password, userName }) => {
+  const supabase = getSupabaseBrowser();
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -38,6 +44,7 @@ export const signUp = async ({ email, password, userName }) => {
     throw error;
   }
 
+  // identities 없으면 (= 이미 존재하면) 예외 던지는 기존 로직 유지
   if (!data?.user?.identities?.length) {
     throw new Error('사용자가 이미 존재합니다.');
   }
@@ -49,6 +56,8 @@ export const signUp = async ({ email, password, userName }) => {
  * Sign out
  *************************************** */
 export const signOut = async () => {
+  const supabase = getSupabaseBrowser();
+
   const { error } = await supabase.auth.signOut();
 
   if (error) {
@@ -63,6 +72,8 @@ export const signOut = async () => {
  * Reset password
  *************************************** */
 export const resetPassword = async ({ email }) => {
+  const supabase = getSupabaseBrowser();
+
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${window.location.origin}${paths.auth.supabase.updatePassword}`,
   });
@@ -79,6 +90,8 @@ export const resetPassword = async ({ email }) => {
  * Update password
  *************************************** */
 export const updatePassword = async ({ password }) => {
+  const supabase = getSupabaseBrowser();
+
   const { data, error } = await supabase.auth.updateUser({ password });
 
   if (error) {
