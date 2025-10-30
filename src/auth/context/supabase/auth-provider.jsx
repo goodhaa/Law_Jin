@@ -13,7 +13,6 @@ import { AuthContext } from '../auth-context';
 export function AuthProvider({ children }) {
   const { state, setState } = useSetState({ user: null, loading: true });
 
-  // ✅ 이제 이름 맞춤: getSupabaseBrowser()
   const supabase = useMemo(() => getSupabaseBrowser(), []);
 
   const checkUserSession = useCallback(async () => {

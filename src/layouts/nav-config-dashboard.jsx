@@ -65,12 +65,14 @@ export const navData = [
     subheader: 'Overview',
     items: [
       { title: 'App', path: paths.dashboard.root, icon: ICONS.dashboard },
+     /*
       { title: 'Ecommerce', path: paths.dashboard.general.ecommerce, icon: ICONS.ecommerce },
       { title: 'Analytics', path: paths.dashboard.general.analytics, icon: ICONS.analytics },
       { title: 'Banking', path: paths.dashboard.general.banking, icon: ICONS.banking },
       { title: 'Booking', path: paths.dashboard.general.booking, icon: ICONS.booking },
       { title: 'File', path: paths.dashboard.general.file, icon: ICONS.file },
       { title: 'Course', path: paths.dashboard.general.course, icon: ICONS.course },
+      */
     ],
   },
   /**
@@ -84,14 +86,15 @@ export const navData = [
         path: paths.dashboard.user.root,
         icon: ICONS.user,
         children: [
-          { title: 'Profile', path: paths.dashboard.user.root },
-          { title: 'Cards', path: paths.dashboard.user.cards },
+          //{ title: 'Profile', path: paths.dashboard.user.root },
+          //{ title: 'Cards', path: paths.dashboard.user.cards },
           { title: 'List', path: paths.dashboard.user.list },
-          { title: 'Create', path: paths.dashboard.user.new },
+          //{ title: 'Create', path: paths.dashboard.user.new },
           { title: '수정', path: paths.dashboard.user.demo.edit },
-          { title: 'Account', path: paths.dashboard.user.account, deepMatch: true },
+          //{ title: 'Account', path: paths.dashboard.user.account, deepMatch: true },
         ],
       },
+      /*
       {
         title: 'Product',
         path: paths.dashboard.product.root,
@@ -102,7 +105,7 @@ export const navData = [
           { title: 'Create', path: paths.dashboard.product.new },
           { title: 'Edit', path: paths.dashboard.product.demo.edit },
         ],
-      },
+      },*/
       {
         title: 'Order',
         path: paths.dashboard.order.root,
@@ -112,6 +115,7 @@ export const navData = [
           { title: 'Details', path: paths.dashboard.order.demo.details },
         ],
       },
+      /*
       {
         title: 'Invoice',
         path: paths.dashboard.invoice.root,
@@ -168,8 +172,11 @@ export const navData = [
         ),
       },
       { title: 'Chat', path: paths.dashboard.chat, icon: ICONS.chat },
-      { title: 'Calendar', path: paths.dashboard.calendar, icon: ICONS.calendar },
+      */
+      { title: '일정', path: paths.dashboard.calendar, icon: ICONS.calendar },
+      /*
       { title: 'Kanban', path: paths.dashboard.kanban, icon: ICONS.kanban },
+       */
     ],
   },
   /**

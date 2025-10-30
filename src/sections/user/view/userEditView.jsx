@@ -10,6 +10,26 @@ import { UserCreateEditForm } from '../userCreateEditForm';
 
 // ----------------------------------------------------------------------
 
+
+export function UserEditView() {
+  return (
+    <DashboardContent>
+      <CustomBreadcrumbs
+        heading="사용자 정보"
+        links={[
+          { name: 'Dashboard', href: paths.dashboard.root },
+          { name: '사용자', href: paths.dashboard.user.root },
+          { name: '저장' },
+        ]}
+        sx={{ mb: { xs: 3, md: 5 } }}
+      />
+
+      <UserCreateEditForm />
+    </DashboardContent>
+  );
+}
+
+/*
 export function UserEditView({ user: currentUser }) {
   return (
     <DashboardContent>
@@ -28,3 +48,5 @@ export function UserEditView({ user: currentUser }) {
     </DashboardContent>
   );
 }
+
+*/

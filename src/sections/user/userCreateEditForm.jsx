@@ -9,6 +9,7 @@ import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Switch from '@mui/material/Switch';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
@@ -41,7 +42,7 @@ export const UserCreateSchema = z.object({
   status: z.string(),
   isVerified: z.boolean(),
 });
-
+const SEX_OPTIONS = ['남자', '여자'];
 // ----------------------------------------------------------------------
 
 export function UserCreateEditForm({ currentUser }) {
@@ -169,6 +170,7 @@ export function UserCreateEditForm({ currentUser }) {
               />
             )}
 
+            {/* 
             <Field.Switch
               name="isVerified"
               labelPlacement="start"
@@ -184,6 +186,7 @@ export function UserCreateEditForm({ currentUser }) {
               }
               sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
             />
+            */}
 
             {currentUser && (
               <Stack sx={{ mt: 3, alignItems: 'center', justifyContent: 'center' }}>
@@ -205,28 +208,44 @@ export function UserCreateEditForm({ currentUser }) {
                 gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
               }}
             >
-              <Field.Text name="name" label="Full name" />
-              <Field.Text name="email" label="Email address" />
-              <Field.Phone name="phoneNumber" label="Phone number" defaultCountry="US" />
-
+              <Field.Text name="name" label="이름" />
+              <Field.Text name="email" label="Email 주소" />
+              
+              {/*<Field.Phone name="phone" label="핸드폰 번호" defaultCountry="US" />
               <Field.CountrySelect
                 fullWidth
                 name="country"
                 label="Country"
                 placeholder="Choose a country"
               />
+              */}
+              
+              <Field.Text name="user_id" label="사용자ID" />
+              <Field.Text name="phone" label="핸드폰 번호" />
 
-              <Field.Text name="state" label="State/region" />
-              <Field.Text name="city" label="City" />
-              <Field.Text name="address" label="Address" />
-              <Field.Text name="zipCode" label="Zip/code" />
-              <Field.Text name="company" label="Company" />
-              <Field.Text name="role" label="Role" />
+              <Field.Select
+                fullWidth
+                name="sex"
+                label="성별"
+                slotProps={{ inputLabel: { shrink: true } }}
+              >
+                {SEX_OPTIONS.map((option) => (
+                  <MenuItem key={option} value={option} sx={{ textTransform: 'capitalize' }}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Field.Select>
+
+              <Field.Text name="rrn" label="생년월일" />
+              <Field.Text name="company_cd" label="회사코드" />
+              <Field.Text name="company_nm" label="회사명" />
+              <Field.Text name="duty_cd" label="직급" />
+              <Field.Text name="position_cd" label="직책" />
             </Box>
 
             <Stack sx={{ mt: 3, alignItems: 'flex-end' }}>
               <Button type="submit" variant="contained" loading={isSubmitting}>
-                {!currentUser ? 'Create user' : 'Save changes'}
+                {!currentUser ? '저장' : '변경사항 저장'}
               </Button>
             </Stack>
           </Card>
