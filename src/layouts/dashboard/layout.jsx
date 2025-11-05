@@ -115,10 +115,12 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
           )}
 
           {/** @slot Workspace popover */}
+          {/*
           <WorkspacesPopover
             data={_workspaces}
             sx={{ ...(isNavHorizontal && { color: 'var(--layout-nav-text-primary-color)' }) }}
           />
+          */}
         </>
       ),
       rightArea: (
@@ -126,15 +128,19 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
           {/** @slot Searchbar */}
           <Searchbar data={navData} />
 
-          {/** @slot Language popover */}
+          {/** @slot 언어변경 아이콘 */}
+          {/*
           <LanguagePopover data={allLangs} />
-
-          {/** @slot Notifications popover */}
+          */}
+          {/** @slot 알림 아이콘  popover */}
+          {/*
           <NotificationsDrawer data={_notifications} />
+          */}
 
           {/** @slot Contacts popover */}
+          {/*
           <ContactsPopover data={_contacts} />
-
+          */}
           {/** @slot Settings button */}
           <SettingsButton />
 

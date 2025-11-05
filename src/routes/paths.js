@@ -115,7 +115,7 @@ export const paths = {
       profile: `${ROOTS.DASHBOARD}/user/profile`,
       account: `${ROOTS.DASHBOARD}/user/account`,
       edit: (id) => `${ROOTS.DASHBOARD}/user/${id}/edit`,
-      demo: { edit: `${ROOTS.DASHBOARD}/user/edit` },
+      demo: { edit: `${ROOTS.DASHBOARD}/user/${MOCK_ID}/edit` },
     },
     product: {
       root: `${ROOTS.DASHBOARD}/product`,
@@ -170,6 +170,16 @@ export const paths = {
       demo: {
         details: `${ROOTS.DASHBOARD}/tour/${MOCK_ID}`,
         edit: `${ROOTS.DASHBOARD}/tour/${MOCK_ID}/edit`,
+      },
+    },
+    incident : {
+      root: `${ROOTS.DASHBOARD}/incident`,
+      new: `${ROOTS.DASHBOARD}/incident/new`,
+      details: (id) => `${ROOTS.DASHBOARD}/incident/${id}`,
+      edit: (id) => `${ROOTS.DASHBOARD}/incident/${id}/edit`,
+      demo: {
+        details: `${ROOTS.DASHBOARD}/incident/${MOCK_ID}`,
+        edit: `${ROOTS.DASHBOARD}/incident/${MOCK_ID}/edit`,
       },
     },
   },

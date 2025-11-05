@@ -6,26 +6,24 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
-import { UserCreateEditForm } from '../userCreateEditForm';
+import { IncidentCreateEditForm } from '../incidentCreateEditForm';
 
 // ----------------------------------------------------------------------
 
-
-export function UserEditView({ user: currentUser }) {
+export function IncidentCreateView() {
   return (
     <DashboardContent>
       <CustomBreadcrumbs
-        heading="수정"
-        backHref={paths.dashboard.user.list}
+        heading="신건 등록"
         links={[
           { name: 'Dashboard', href: paths.dashboard.root },
-          { name: '사용자', href: paths.dashboard.user.root },
-          { name: currentUser?.USER_NM },
+          { name: '사건', href: paths.dashboard.product.root },
+          { name: '등록' },
         ]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />
 
-      <UserCreateEditForm currentUser={currentUser} />
+      <IncidentCreateEditForm />
     </DashboardContent>
   );
 }

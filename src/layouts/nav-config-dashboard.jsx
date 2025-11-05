@@ -82,13 +82,23 @@ export const navData = [
     subheader: 'Management',
     items: [
       {
+        title: '사건',
+        path: paths.dashboard.incident.root,
+        icon: ICONS.file,
+        children: [
+          { title: '목록', path: paths.dashboard.incident.root },
+          { title: '등록', path: paths.dashboard.incident.new },
+          { title: '수정', path: paths.dashboard.incident.demo.edit },
+        ],
+      },
+      {
         title: '사용자',
         path: paths.dashboard.user.root,
         icon: ICONS.user,
         children: [
           //{ title: 'Profile', path: paths.dashboard.user.root },
           //{ title: 'Cards', path: paths.dashboard.user.cards },
-          { title: 'List', path: paths.dashboard.user.list },
+          { title: '목록', path: paths.dashboard.user.list },
           //{ title: 'Create', path: paths.dashboard.user.new },
           { title: '수정', path: paths.dashboard.user.demo.edit },
           //{ title: 'Account', path: paths.dashboard.user.account, deepMatch: true },
@@ -149,6 +159,7 @@ export const navData = [
           { title: 'Edit', path: paths.dashboard.job.demo.edit },
         ],
       },
+      */
       {
         title: 'Tour',
         path: paths.dashboard.tour.root,
@@ -160,6 +171,7 @@ export const navData = [
           { title: 'Edit', path: paths.dashboard.tour.demo.edit },
         ],
       },
+      /*
       { title: 'File manager', path: paths.dashboard.fileManager, icon: ICONS.folder },
       {
         title: 'Mail',

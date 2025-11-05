@@ -25,7 +25,7 @@ export function AuthGuard({ children }) {
   const { authenticated, loading } = useAuthContext();
 
   const [isChecking, setIsChecking] = useState(true);
-
+  
   const createRedirectPath = (currentPath) => {
     const queryString = new URLSearchParams({ returnTo: pathname }).toString();
     return `${currentPath}?${queryString}`;

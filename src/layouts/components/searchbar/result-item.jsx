@@ -14,7 +14,7 @@ export function ResultItem({ title, path, labels, href, sx, ...other }) {
   const linkProps = isExternalLink(href)
     ? { component: 'a', href, target: '_blank', rel: 'noopener noreferrer' }
     : { component: RouterLink, href };
-
+    
   return (
     <ListItemButton
       {...linkProps}

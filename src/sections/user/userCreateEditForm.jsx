@@ -1,74 +1,75 @@
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller } from 'react-hook-form';
-import { isValidPhoneNumber } from 'react-phone-number-input/input';
+import { useForm } from 'react-hook-form';
+import React, { useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import Switch from '@mui/material/Switch';
-import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import { MenuItem } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
-
 import { fData } from 'src/utils/format-number';
-
-import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
-
+import { getSupabaseBrowser } from 'src/lib/supabase/client'; // 클라이언트용 supabase 인스턴스
 // ----------------------------------------------------------------------
 
 export const UserCreateSchema = z.object({
-  avatarUrl: schemaUtils.file({ error: 'Avatar is required!' }),
-  name: z.string().min(1, { error: 'Name is required!' }),
-  email: schemaUtils.email(),
-  phoneNumber: schemaUtils.phoneNumber({ isValid: isValidPhoneNumber }),
-  country: schemaUtils.nullableInput(z.string().min(1, { error: 'Country is required!' }), {
-    error: 'Country is required!',
-  }),
-  address: z.string().min(1, { error: 'Address is required!' }),
-  company: z.string().min(1, { error: 'Company is required!' }),
-  state: z.string().min(1, { error: 'State is required!' }),
-  city: z.string().min(1, { error: 'City is required!' }),
-  role: z.string().min(1, { error: 'Role is required!' }),
-  zipCode: z.string().min(1, { error: 'Zip code is required!' }),
-  // Not required
-  status: z.string(),
-  isVerified: z.boolean(),
+ // avatarUrl: schemaUtils.file({ error: 'Avatar is required!' }),
+  //PHONE: schemaUtils.phoneNumber({ isValid: isValidPhoneNumber }),
+  USER_ID: z.string().min(1, { error: '사용자 ID를 입력하세요' }),  
+  GENDER: z.string().min(1, { error: '성별을 선택하세요' }),
+  RRN: z.string().min(6, { error: '생년월일을 입력하세요' }),
+  COMPANY_NM: z.string().min(1, { error: '회사명을 입력하세요' }),
+  PHONE: z.string(),
+  COMPANY_CD: z.string(),
+  DUTY_CD: z.string(),
+  POSITION_CD: z.string(),
+  EX_NO: z.string(),
+  UPDATED_DTIME: z.string().optional(),
 });
-const SEX_OPTIONS = ['남자', '여자'];
+
 // ----------------------------------------------------------------------
 
 export function UserCreateEditForm({ currentUser }) {
   const router = useRouter();
 
   const defaultValues = {
-    status: '',
-    avatarUrl: null,
-    isVerified: true,
-    name: '',
-    email: '',
-    phoneNumber: '',
-    country: '',
-    state: '',
-    city: '',
-    address: '',
-    zipCode: '',
-    company: '',
-    role: '',
-  };
+    avatarUrl: '',
+    USER_NM: '',
+    EMAIL: '',
+    USER_ID: '',
+    PHONE: '',
+    GENDER: '',
+    RRN: '',
+    COMPANY_CD: '',
+    COMPANY_NM: '',
+    EX_NO: '',
+    DUTY_CD: '',
+    POSITION_CD: '',
+    UPDATED_DTIME: '',
+  }
+
+  // currentUser 값중 null인경우 ''으로 치환
+  const safeUser = currentUser
+  ? {
+      ...defaultValues,
+      ...Object.fromEntries(
+        Object.entries(currentUser).map(([key, value]) => [key, value ?? ''])
+      ),
+    }
+  : defaultValues;
 
   const methods = useForm({
     mode: 'onSubmit',
     resolver: zodResolver(UserCreateSchema),
-    defaultValues,
-    values: currentUser,
+    defaultValues: safeUser,
+    //values: currentUser,
   });
 
   const {
@@ -80,37 +81,67 @@ export function UserCreateEditForm({ currentUser }) {
   } = methods;
 
   const values = watch();
+  const { setValue } = methods;
+
+  useEffect(() => {
+    const now = new Date().toISOString(); // 또는 한국시간 포맷도 가능
+    setValue('UPDATED_DTIME', now);
+  }, [setValue]);
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
-      toast.success(currentUser ? 'Update success!' : 'Create success!');
-      router.push(paths.dashboard.user.list);
-      console.info('DATA', data);
-    } catch (error) {
-      console.error(error);
+  try {
+    // 반드시 currentUser.id가 있어야 업데이트 수행
+    if (!currentUser?.id) {
+      console.error('Update aborted: currentUser.id is missing', currentUser);
+      toast.error('사용자 ID가 없어 업데이트할 수 없습니다.');
+      return;
     }
-  });
+    
+    // 업데이트 항목 Setting
+    const payload = Object.fromEntries(
+      Object.entries(data).map(([key, value]) => [key, value ?? ''])
+    );
+
+    console.log('currentUser:', currentUser);
+    console.log('Attempting UPDATE, id:', currentUser.id);
+    console.log('Payload:', JSON.stringify(payload, null, 2));
+
+    // id 타입 맞추기 (숫자형 id인 경우 Number 변환)
+    //const idForQuery = isNaN(Number(currentUser.id)) ? currentUser.id : Number(currentUser.id);
+    
+    const supabase = getSupabaseBrowser();
+
+    const res = await supabase
+      .from('USER_BASE')
+      .update(payload)
+      .eq('id', currentUser.id)
+      .select()
+      .single();
+
+    console.log('Supabase update response:', JSON.stringify(res, null, 2));
+
+    if (res.error) {
+      console.error('Update error details:', res.error);
+      toast.error('사용자 정보 수정에 실패했습니다. 콘솔을 확인하세요.');
+      return;
+    }
+
+    // 성공 시
+    toast.success('사용자 정보가 수정되었습니다.');
+    reset();
+    router.push(paths.dashboard.user.list);
+  } catch (err) {
+    console.error('onSubmit 예외:', err);
+    toast.error('알 수 없는 오류가 발생했습니다. 콘솔을 확인하세요.');
+  }
+});
 
   return (
     <Form methods={methods} onSubmit={onSubmit}>
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ pt: 10, pb: 5, px: 3 }}>
-            {currentUser && (
-              <Label
-                color={
-                  (values.status === 'active' && 'success') ||
-                  (values.status === 'banned' && 'error') ||
-                  'warning'
-                }
-                sx={{ position: 'absolute', top: 24, right: 24 }}
-              >
-                {values.status}
-              </Label>
-            )}
-
+            
             <Box sx={{ mb: 5 }}>
               <Field.UploadAvatar
                 name="avatarUrl"
@@ -126,72 +157,18 @@ export function UserCreateEditForm({ currentUser }) {
                       color: 'text.disabled',
                     }}
                   >
-                    Allowed *.jpeg, *.jpg, *.png, *.gif
-                    <br /> max size of {fData(3145728)}
+                    허용된 확장자 *.jpeg, *.jpg, *.png, *.gif
+                    <br /> 최대 사이즈 {fData(3145728)}
                   </Typography>
                 }
               />
             </Box>
 
-            {currentUser && (
-              <FormControlLabel
-                labelPlacement="start"
-                control={
-                  <Controller
-                    name="status"
-                    control={control}
-                    render={({ field }) => (
-                      <Switch
-                        {...field}
-                        checked={field.value !== 'active'}
-                        onChange={(event) =>
-                          field.onChange(event.target.checked ? 'banned' : 'active')
-                        }
-                      />
-                    )}
-                  />
-                }
-                label={
-                  <>
-                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                      Banned
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                      Apply disable account
-                    </Typography>
-                  </>
-                }
-                sx={{
-                  mx: 0,
-                  mb: 3,
-                  width: 1,
-                  justifyContent: 'space-between',
-                }}
-              />
-            )}
-
-            {/* 
-            <Field.Switch
-              name="isVerified"
-              labelPlacement="start"
-              label={
-                <>
-                  <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                    Email verified
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Disabling this will automatically send the user a verification email
-                  </Typography>
-                </>
-              }
-              sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
-            />
-            */}
-
+            {/*  Todo리스트 권한별 노출*/}
             {currentUser && (
               <Stack sx={{ mt: 3, alignItems: 'center', justifyContent: 'center' }}>
                 <Button variant="soft" color="error">
-                  Delete user
+                  사용자 삭제
                 </Button>
               </Stack>
             )}
@@ -208,44 +185,30 @@ export function UserCreateEditForm({ currentUser }) {
                 gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
               }}
             >
-              <Field.Text name="name" label="이름" />
-              <Field.Text name="email" label="Email 주소" />
+              <Field.Text name="USER_NM" label="이름" disabled/>
+              <Field.Text name="EMAIL" label="Email 주소" disabled/>
               
-              {/*<Field.Phone name="phone" label="핸드폰 번호" defaultCountry="US" />
-              <Field.CountrySelect
-                fullWidth
-                name="country"
-                label="Country"
-                placeholder="Choose a country"
-              />
-              */}
+              <Field.Text name="USER_ID" label="사용자ID" />
+              <Field.Text name="PHONE" label="핸드폰 번호" />
               
-              <Field.Text name="user_id" label="사용자ID" />
-              <Field.Text name="phone" label="핸드폰 번호" />
-
-              <Field.Select
-                fullWidth
-                name="sex"
-                label="성별"
-                slotProps={{ inputLabel: { shrink: true } }}
-              >
-                {SEX_OPTIONS.map((option) => (
-                  <MenuItem key={option} value={option} sx={{ textTransform: 'capitalize' }}>
-                    {option}
-                  </MenuItem>
-                ))}
+              <Field.Select name="GENDER" label="성별" defaultValue="M" > 
+                <MenuItem value="M">남자</MenuItem>
+                <MenuItem value="F">여자</MenuItem>
               </Field.Select>
-
-              <Field.Text name="rrn" label="생년월일" />
-              <Field.Text name="company_cd" label="회사코드" />
-              <Field.Text name="company_nm" label="회사명" />
-              <Field.Text name="duty_cd" label="직급" />
-              <Field.Text name="position_cd" label="직책" />
+              
+              <Field.Text name="RRN" label="생년월일" />
+              {/*<Field.Text name="COMPANY_CD" label="회사코드"  sx={{ display: 'none' }} value = "C001" /> */}
+              <Field.Text name="COMPANY_CD" label="회사코드" />
+              <Field.Text name="COMPANY_NM" label="회사명" />
+              <Field.Text name="EX_NO" label="내선번호" />
+              <Field.Text name="DUTY_CD" label="직급" />
+              <Field.Text name="POSITION_CD" label="직책" />
+              <Field.Text name="UPDATED_DTIME" label="업데이트 시간" sx={{ display: 'none' }}  />
             </Box>
 
             <Stack sx={{ mt: 3, alignItems: 'flex-end' }}>
               <Button type="submit" variant="contained" loading={isSubmitting}>
-                {!currentUser ? '저장' : '변경사항 저장'}
+                변경사항 저장
               </Button>
             </Stack>
           </Card>
