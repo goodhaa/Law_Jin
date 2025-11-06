@@ -7,20 +7,9 @@ import { createServerSupabase } from 'src/lib/supabase/server';
 
 export const metadata = { title: `User edit | Dashboard - ${CONFIG.appName}` };
 
-export default async function Page({ params }) {
-
-  const supabase = await createServerSupabase();
-  const { data: { user }, } = await supabase.auth.getUser();
-  const userId = user?.id;
-
-  // 또는 service role 키로 직접 DB를 조회(주의: 보안)
-  const { data: currentUser } = await supabase
-    .from('USER_BASE')
-    .select('id, EMAIL, USER_ID, USER_NM, PHONE, RRN, COMPANY_CD, COMPANY_NM, GRADE, ROLE, EX_NO, GENDER')
-    .eq('id', userId);
-
-  console.log("사용자 edit Page ");
-  return <UserEditView user={currentUser} />;
+export default async function Page() {
+  
+  return <UserEditView/>;
 }
 
 // ----------------------------------------------------------------------

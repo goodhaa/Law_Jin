@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
       // USER_BASE에서 USER_ID = auth.uid() 행을 가져옴
       const { data, error } = await supabase
         .from('USER_BASE')
-        .select('USER_NM, EMAIL, USER_ID, RRN')
+        .select('USER_NM, EMAIL, USER_ID, COMPANY_CD, id')
         .eq('id', uid)
         .single();
 
@@ -107,6 +107,8 @@ export function AuthProvider({ children }) {
           // 🔹 USER_BASE.USER_NM > user_metadata.* > email-id
           displayName: state.userBase?.USER_NM, 
           email: state.userBase?.EMAIL || state.user?.email || undefined,
+          companyCd: state.userBase?.COMPANY_CD, 
+          userId: state.userBase?.USER_ID, 
           role: state.user?.role ?? 'admin',
         }
         : null,

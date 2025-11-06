@@ -29,7 +29,8 @@ import { UserTableRow } from '../userTableRow';
 import { UserTableToolbar } from '../userTableToolbar';
 import { UserTableFiltersResult } from '../userTableFiltersResult';
 import { getSupabaseBrowser } from 'src/lib/supabase/client';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
+import { AuthContext } from 'src/auth/context/auth-context';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -44,8 +45,6 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-
-
 export function UserListView() {
   const table = useTable();
 
@@ -55,6 +54,8 @@ export function UserListView() {
 
   const filters = useSetState({ name: '', role: [] });
   const { state: currentFilters} = filters;
+
+  const { userBase } = useContext(AuthContext); // 로그인된 사용자 정보 가져오기
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -67,7 +68,7 @@ export function UserListView() {
 
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
 
-
+   console.log('✅ 로그인된 회원정보:', userBase);
   useEffect(() => {
   let mounted = true;
   const fetchUsers = async () => {
@@ -77,7 +78,7 @@ export function UserListView() {
       const { data, error } = await supabase
         .from('USER_BASE')
         .select('id, USER_NM, EMAIL, PHONE, GRADE, ROLE, EX_NO, DEPT')
-        //.eq('COMPANY_CD', userId);
+        .eq('COMPANY_CD', userBase?.COMPANY_CD);
       console.log('✅ supabase raw data:', data);
 
       if (error) throw error;
