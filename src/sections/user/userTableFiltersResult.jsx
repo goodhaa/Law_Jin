@@ -14,11 +14,6 @@ export function UserTableFiltersResult({ filters, onResetPage, totalResults, sx 
     updateFilters({ name: '' });
   }, [onResetPage, updateFilters]);
 
-  const handleRemoveStatus = useCallback(() => {
-    onResetPage();
-    updateFilters({ status: 'all' });
-  }, [onResetPage, updateFilters]);
-
   const handleRemoveRole = useCallback(
     (inputValue) => {
       const newValue = currentFilters.role.filter((item) => item !== inputValue);
@@ -36,15 +31,6 @@ export function UserTableFiltersResult({ filters, onResetPage, totalResults, sx 
 
   return (
     <FiltersResult totalResults={totalResults} onReset={handleReset} sx={sx}>
-      <FiltersBlock label="Status:" isShow={currentFilters.status !== 'all'}>
-        <Chip
-          {...chipProps}
-          label={currentFilters.status}
-          onDelete={handleRemoveStatus}
-          sx={{ textTransform: 'capitalize' }}
-        />
-      </FiltersBlock>
-
       <FiltersBlock label="Role:" isShow={!!currentFilters.role.length}>
         {currentFilters.role.map((item) => (
           <Chip {...chipProps} key={item} label={item} onDelete={() => handleRemoveRole(item)} />

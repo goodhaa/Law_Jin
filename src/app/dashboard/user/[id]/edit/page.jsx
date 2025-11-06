@@ -2,29 +2,24 @@ import { CONFIG } from 'src/global-config';
 import { _userList } from 'src/_mock/_user';
 
 import { UserEditView } from 'src/sections/user/view';
-import { cookies } from 'next/headers';
 import { createServerSupabase } from 'src/lib/supabase/server';
 // ----------------------------------------------------------------------
 
 export const metadata = { title: `User edit | Dashboard - ${CONFIG.appName}` };
 
 export default async function Page({ params }) {
-  const supabase = await createServerSupabase(); // ← 중요!!
 
-const {
-  data: { user },
-} = await supabase.auth.getUser();
-
-const userId = user?.id;
+  const supabase = await createServerSupabase();
+  const { data: { user }, } = await supabase.auth.getUser();
+  const userId = user?.id;
 
   // 또는 service role 키로 직접 DB를 조회(주의: 보안)
   const { data: currentUser } = await supabase
     .from('USER_BASE')
-    .select('id, EMAIL, USER_ID, USER_NM, PHONE, RRN, COMPANY_CD, COMPANY_NM, DUTY_CD, POSITION_CD, EX_NO, GENDER')
-    .eq('id', userId)
-    .single();
+    .select('id, EMAIL, USER_ID, USER_NM, PHONE, RRN, COMPANY_CD, COMPANY_NM, GRADE, ROLE, EX_NO, GENDER')
+    .eq('id', userId);
 
-  console.log(JSON.stringify(currentUser, null, 2));
+  console.log("사용자 edit Page ");
   return <UserEditView user={currentUser} />;
 }
 

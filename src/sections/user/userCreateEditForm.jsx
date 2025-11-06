@@ -28,8 +28,8 @@ export const UserCreateSchema = z.object({
   COMPANY_NM: z.string().min(1, { error: '회사명을 입력하세요' }),
   PHONE: z.string(),
   COMPANY_CD: z.string(),
-  DUTY_CD: z.string(),
-  POSITION_CD: z.string(),
+  GRADE: z.string(),
+  ROLE: z.string(),
   EX_NO: z.string(),
   UPDATED_DTIME: z.string().optional(),
 });
@@ -50,8 +50,8 @@ export function UserCreateEditForm({ currentUser }) {
     COMPANY_CD: '',
     COMPANY_NM: '',
     EX_NO: '',
-    DUTY_CD: '',
-    POSITION_CD: '',
+    GRADE: '',
+    ROLE: '',
     UPDATED_DTIME: '',
   }
 
@@ -201,8 +201,8 @@ export function UserCreateEditForm({ currentUser }) {
               <Field.Text name="COMPANY_CD" label="회사코드" />
               <Field.Text name="COMPANY_NM" label="회사명" />
               <Field.Text name="EX_NO" label="내선번호" />
-              <Field.Text name="DUTY_CD" label="직급" />
-              <Field.Text name="POSITION_CD" label="직책" />
+              <Field.Text name="GRADE" label="직급" />
+              <Field.Text name="ROLE" label="직책" />
               <Field.Text name="UPDATED_DTIME" label="업데이트 시간" sx={{ display: 'none' }}  />
             </Box>
 
