@@ -2,7 +2,6 @@ import { CONFIG } from 'src/global-config';
 import { _userList } from 'src/_mock/_user';
 
 import { UserEditView } from 'src/sections/user/view';
-import { createServerSupabase } from 'src/lib/supabase/server';
 // ----------------------------------------------------------------------
 
 export const metadata = { title: `User edit | Dashboard - ${CONFIG.appName}` };

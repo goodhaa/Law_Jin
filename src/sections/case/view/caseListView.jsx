@@ -38,9 +38,9 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 
-import { UserTableRow } from '../incidentTableRow';
-import { UserTableToolbar } from '../incidentTableToolbar';
-import { UserTableFiltersResult } from '../incidentTableFiltersResult';
+import { UserTableRow } from '../caseTableRow';
+import { UserTableToolbar } from '../caseTableToolbar';
+import { UserTableFiltersResult } from '../caseTableFiltersResult';
 
 // ----------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export function IncidentListView() {
+export function CaseListView() {
   const table = useTable();
 
   const confirmDialog = useBoolean();
@@ -151,7 +151,7 @@ export function IncidentListView() {
           action={
             <Button
               component={RouterLink}
-              href={paths.dashboard.incident.new}
+              href={paths.dashboard.case.new}
               variant="contained"
               startIcon={<Iconify icon="mingcute:add-line" />}
             >

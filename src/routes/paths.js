@@ -172,14 +172,14 @@ export const paths = {
         edit: `${ROOTS.DASHBOARD}/tour/${MOCK_ID}/edit`,
       },
     },
-    incident : {
-      root: `${ROOTS.DASHBOARD}/incident`,
-      new: `${ROOTS.DASHBOARD}/incident/new`,
-      details: (id) => `${ROOTS.DASHBOARD}/incident/${id}`,
-      edit: (id) => `${ROOTS.DASHBOARD}/incident/${id}/edit`,
+    case : {
+      root: `${ROOTS.DASHBOARD}/case`,
+      new: `${ROOTS.DASHBOARD}/case/new`,
+      details: (id) => `${ROOTS.DASHBOARD}/case/${id}`,
+      edit: (id) => `${ROOTS.DASHBOARD}/case/${id}/edit`,
       demo: {
-        details: `${ROOTS.DASHBOARD}/incident/${MOCK_ID}`,
-        edit: `${ROOTS.DASHBOARD}/incident/${MOCK_ID}/edit`,
+        details: `${ROOTS.DASHBOARD}/case/${MOCK_ID}`,
+        edit: `${ROOTS.DASHBOARD}/case/${MOCK_ID}/edit`,
       },
     },
   },

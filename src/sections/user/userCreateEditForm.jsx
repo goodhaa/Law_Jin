@@ -72,7 +72,6 @@ export function UserCreateEditForm({ currentUser }) {
   });
 
   const {
-    reset,
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
@@ -85,73 +84,73 @@ export function UserCreateEditForm({ currentUser }) {
   }, [setValue]);
 
   const onSubmit = handleSubmit(async (data) => {
-  try {
-    // 반드시 currentUser.id가 있어야 업데이트 수행
-    if (!currentUser?.id) {
-      console.error('Update aborted: currentUser.id is missing', currentUser);
-      toast.error('사용자 ID가 없어 업데이트할 수 없습니다.');
-      return;
+    try {
+      // 반드시 currentUser.id가 있어야 업데이트 수행
+      if (!currentUser?.id) {
+        console.error('Update aborted: currentUser.id is missing', currentUser);
+        toast.error('사용자 ID가 없어 업데이트할 수 없습니다.');
+        return;
+      }
+      
+      // 업데이트 항목 Setting
+      const payload = Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [key, value ?? ''])
+      );
+
+      console.log('currentUser:', currentUser);
+      console.log('Attempting UPDATE, id:', currentUser.id);
+      console.log('Payload:', JSON.stringify(payload, null, 2));
+      
+      const supabase = getSupabaseBrowser();
+
+      // 1) USER_BASE 업데이트
+      const resMain = await supabase
+        .from('USER_BASE')
+        .update(payload)
+        .eq('id', currentUser.id)
+        .select()
+        .single();
+
+      if (resMain.error) {
+        console.error('Update error details:', resMain.error);
+        toast.error('사용자 정보 수정에 실패했습니다. 콘솔을 확인하세요.');
+        return;
+      }
+
+      // 2) USER_COMP_REL_INFO upsert
+      // form에서 USER_ID나 COMPANY_CD를 변경했을 수 있으므로 data에서 우선 가져오고,
+      // 없으면 기존 currentUser 값을 사용하게끔 안전하게 처리합니다.
+      const compPayload = {
+        id: currentUser.id, 
+        USER_ID: payload.USER_ID ?? currentUser.USER_ID ?? '',
+        COMPANY_CD: payload.COMPANY_CD ?? currentUser.COMPANY_CD ?? '',
+      };
+
+      // upsert: 없으면 insert, 있으면 update (기본 PK로 판단)
+      // onConflict 옵션으로 충돌 컬럼을 명시할 수도 있습니다 (예: onConflict: 'id')
+      const resComp = await supabase
+        .from('USER_COMP_REL_INFO')
+        .upsert(compPayload, { onConflict: 'id' })
+        .select()
+        .single();
+
+      if (resComp.error) {
+        console.error('USER_COMP_REL_INFO upsert error details:', resComp.error);
+        // USER_BASE는 이미 업데이트 되었을 수 있음 -> 적절히 처리
+        toast.error('회사 관계 정보 저장에 실패했습니다. 콘솔을 확인하세요.');
+        return;
+      }
+
+      console.log('Upserting USER_COMP_REL_INFO with:', compPayload);
+
+      // 성공 시
+      toast.success('사용자 정보가 수정되었습니다.');
+      //reset();
+      router.push(paths.dashboard.user.list);
+    } catch (err) {
+      console.error('onSubmit 예외:', err);
+      toast.error('알 수 없는 오류가 발생했습니다. 콘솔을 확인하세요.');
     }
-    
-    // 업데이트 항목 Setting
-    const payload = Object.fromEntries(
-      Object.entries(data).map(([key, value]) => [key, value ?? ''])
-    );
-
-    console.log('currentUser:', currentUser);
-    console.log('Attempting UPDATE, id:', currentUser.id);
-    console.log('Payload:', JSON.stringify(payload, null, 2));
-    
-    const supabase = getSupabaseBrowser();
-
-    // 1) USER_BASE 업데이트
-    const resMain = await supabase
-      .from('USER_BASE')
-      .update(payload)
-      .eq('id', currentUser.id)
-      .select()
-      .single();
-
-    if (resMain.error) {
-      console.error('Update error details:', resMain.error);
-      toast.error('사용자 정보 수정에 실패했습니다. 콘솔을 확인하세요.');
-      return;
-    }
-
-    // 2) USER_COMP_REL_INFO upsert
-    // form에서 USER_ID나 COMPANY_CD를 변경했을 수 있으므로 data에서 우선 가져오고,
-    // 없으면 기존 currentUser 값을 사용하게끔 안전하게 처리합니다.
-    const compPayload = {
-      id: currentUser.id, 
-      USER_ID: payload.USER_ID ?? currentUser.USER_ID ?? '',
-      COMPANY_CD: payload.COMPANY_CD ?? currentUser.COMPANY_CD ?? '',
-    };
-
-     // upsert: 없으면 insert, 있으면 update (기본 PK로 판단)
-    // onConflict 옵션으로 충돌 컬럼을 명시할 수도 있습니다 (예: onConflict: 'id')
-    const resComp = await supabase
-      .from('USER_COMP_REL_INFO')
-      .upsert(compPayload, { onConflict: 'id' })
-      .select()
-      .single();
-
-    if (resComp.error) {
-      console.error('USER_COMP_REL_INFO upsert error details:', resComp.error);
-      // USER_BASE는 이미 업데이트 되었을 수 있음 -> 적절히 처리
-      toast.error('회사 관계 정보 저장에 실패했습니다. 콘솔을 확인하세요.');
-      return;
-    }
-
-    console.log('Upserting USER_COMP_REL_INFO with:', compPayload);
-
-    // 성공 시
-    toast.success('사용자 정보가 수정되었습니다.');
-    //reset();
-    router.push(paths.dashboard.user.list);
-  } catch (err) {
-    console.error('onSubmit 예외:', err);
-    toast.error('알 수 없는 오류가 발생했습니다. 콘솔을 확인하세요.');
-  }
 });
 
   return (

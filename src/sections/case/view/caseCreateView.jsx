@@ -6,24 +6,24 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
-import { IncidentCreateEditForm } from '../incidentCreateEditForm';
+import { CaseCreateEditForm } from '../caseCreateEditForm';
 
 // ----------------------------------------------------------------------
 
-export function IncidentCreateView() {
+export function CaseCreateView() {
   return (
     <DashboardContent>
       <CustomBreadcrumbs
         heading="신건 등록"
         links={[
           { name: 'Dashboard', href: paths.dashboard.root },
-          { name: '사건', href: paths.dashboard.product.root },
+          { name: '사건', href: paths.dashboard.case.root },
           { name: '등록' },
         ]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />
 
-      <IncidentCreateEditForm />
+      <CaseCreateEditForm />
     </DashboardContent>
   );
 }

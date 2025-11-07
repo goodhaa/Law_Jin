@@ -69,40 +69,44 @@ export function UserListView() {
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
 
    console.log('✅ 로그인된 회원정보:', userBase);
+
   useEffect(() => {
-  let mounted = true;
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const supabase = getSupabaseBrowser();
-      const { data, error } = await supabase
-        .from('USER_BASE')
-        .select('id, USER_NM, EMAIL, PHONE, GRADE, ROLE, EX_NO, DEPT')
-        .eq('COMPANY_CD', userBase?.COMPANY_CD);
-      console.log('✅ supabase raw data:', data);
 
-      if (error) throw error;
+    let mounted = true;
 
-      const users = (data || []).map((r) => ({
-        id: r.id,
-        USER_NM: r.USER_NM ?? '',
-        EMAIL: r.EMAIL ?? '',
-        PHONE: r.PHONE ?? '',
-        GRADE: r.GRADE ?? '',
-        ROLE: r.ROLE ?? '',
-        EX_NO: r.EX_NO ?? '',
-        DEPT: r.DEPT_NM ?? '',
-      }));
-       
+    const fetchUsers = async () => {
+      setLoading(true);
 
-      if (mounted) setTableData(users);
-    } catch (err) {
-      console.error(err);
-      if (mounted) setError(String(err));
-    } finally {
-      if (mounted) setLoading(false);
-    }
-  };
+      try {
+        const supabase = getSupabaseBrowser();
+        const { data, error } = await supabase
+          .from('USER_BASE')
+          .select('id, USER_NM, EMAIL, PHONE, GRADE, ROLE, EX_NO, DEPT')
+          .eq('COMPANY_CD', userBase?.COMPANY_CD);
+
+        console.log('✅ supabase raw data:', data);
+
+        if (error) throw error;
+
+        const users = (data || []).map((r) => ({
+          id: r.id,
+          USER_NM: r.USER_NM ?? '',
+          EMAIL: r.EMAIL ?? '',
+          PHONE: r.PHONE ?? '',
+          GRADE: r.GRADE ?? '',
+          ROLE: r.ROLE ?? '',
+          EX_NO: r.EX_NO ?? '',
+          DEPT: r.DEPT_NM ?? '',
+        }));
+        
+        if (mounted) setTableData(users);
+      } catch (err) {
+        console.error(err);
+        if (mounted) setError(String(err));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
 
   fetchUsers();
   return () => {

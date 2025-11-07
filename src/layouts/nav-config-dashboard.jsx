@@ -83,12 +83,12 @@ export const navData = [
     items: [
       {
         title: '사건',
-        path: paths.dashboard.incident.root,
+        path: paths.dashboard.case.root,
         icon: ICONS.file,
         children: [
-          { title: '목록', path: paths.dashboard.incident.root },
-          { title: '등록', path: paths.dashboard.incident.new },
-          { title: '수정', path: paths.dashboard.incident.demo.edit },
+          { title: '목록', path: paths.dashboard.case.root },
+          { title: '등록', path: paths.dashboard.case.new },
+          { title: '수정', path: paths.dashboard.case.demo.edit },
         ],
       },
       {
