@@ -88,7 +88,7 @@ export const navData = [
         children: [
           { title: '목록', path: paths.dashboard.case.root },
           { title: '등록', path: paths.dashboard.case.new },
-          { title: '수정', path: paths.dashboard.case.demo.edit },
+          //{ title: '수정', path: paths.dashboard.case.demo.edit },
         ],
       },
       {
@@ -115,7 +115,7 @@ export const navData = [
           { title: 'Create', path: paths.dashboard.product.new },
           { title: 'Edit', path: paths.dashboard.product.demo.edit },
         ],
-      },*/
+      },
       {
         title: 'Order',
         path: paths.dashboard.order.root,
@@ -125,6 +125,7 @@ export const navData = [
           { title: 'Details', path: paths.dashboard.order.demo.details },
         ],
       },
+      */
       /*
       {
         title: 'Invoice',
@@ -159,7 +160,7 @@ export const navData = [
           { title: 'Edit', path: paths.dashboard.job.demo.edit },
         ],
       },
-      */
+      
       {
         title: 'Tour',
         path: paths.dashboard.tour.root,
@@ -171,6 +172,7 @@ export const navData = [
           { title: 'Edit', path: paths.dashboard.tour.demo.edit },
         ],
       },
+      */
       /*
       { title: 'File manager', path: paths.dashboard.fileManager, icon: ICONS.folder },
       {

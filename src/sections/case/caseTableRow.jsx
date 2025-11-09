@@ -21,12 +21,18 @@ import { ConfirmDialog } from 'src/components/custom-dialog';
 import { CustomPopover } from 'src/components/custom-popover';
 
 import { UserQuickEditForm } from './user-quick-edit-form';
+import dayjs from 'dayjs';
 
+import { useCodes } from 'src/hooks/useCodes';
 // ----------------------------------------------------------------------
 
-export function UserTableRow({ row, selected, editHref, onSelectRow, onDeleteRow }) {
-  const menuActions = usePopover();
-  const confirmDialog = useBoolean();
+export function CaseTableRow({ row, no, selected }) {
+  const { codes: smallClassCodes } = useCodes('SMALL_CLASS');
+  
+  const codeLabel = smallClassCodes.find(
+    (c) => c.code === row.small_class_cd
+  )?.code_nm ?? row.small_class_cd; 
+  85
   const quickEditForm = useBoolean();
 
   const renderQuickEditForm = () => (
@@ -37,52 +43,10 @@ export function UserTableRow({ row, selected, editHref, onSelectRow, onDeleteRow
     />
   );
 
-  const renderMenuActions = () => (
-    <CustomPopover
-      open={menuActions.open}
-      anchorEl={menuActions.anchorEl}
-      onClose={menuActions.onClose}
-      slotProps={{ arrow: { placement: 'right-top' } }}
-    >
-      <MenuList>
-        <li>
-          <MenuItem component={RouterLink} href={editHref} onClick={() => menuActions.onClose()}>
-            <Iconify icon="solar:pen-bold" />
-            Edit
-          </MenuItem>
-        </li>
-
-        <MenuItem
-          onClick={() => {
-            confirmDialog.onTrue();
-            menuActions.onClose();
-          }}
-          sx={{ color: 'error.main' }}
-        >
-          <Iconify icon="solar:trash-bin-trash-bold" />
-          Delete
-        </MenuItem>
-      </MenuList>
-    </CustomPopover>
-  );
-
-  const renderConfirmDialog = () => (
-    <ConfirmDialog
-      open={confirmDialog.value}
-      onClose={confirmDialog.onFalse}
-      title="Delete"
-      content="Are you sure want to delete?"
-      action={
-        <Button variant="contained" color="error" onClick={onDeleteRow}>
-          Delete
-        </Button>
-      }
-    />
-  );
-
   return (
     <>
       <TableRow hover selected={selected} aria-checked={selected} tabIndex={-1}>
+        {/*
         <TableCell padding="checkbox">
           <Checkbox
             checked={selected}
@@ -95,71 +59,33 @@ export function UserTableRow({ row, selected, editHref, onSelectRow, onDeleteRow
             }}
           />
         </TableCell>
-
-        <TableCell>
-          <Box sx={{ gap: 2, display: 'flex', alignItems: 'center' }}>
-            <Avatar alt={row.name} src={row.avatarUrl} />
-
-            <Stack sx={{ typography: 'body2', flex: '1 1 auto', alignItems: 'flex-start' }}>
-              <Link
-                component={RouterLink}
-                href={editHref}
-                color="inherit"
-                sx={{ cursor: 'pointer' }}
-              >
-                {row.name}
-              </Link>
-              <Box component="span" sx={{ color: 'text.disabled' }}>
-                {row.email}
-              </Box>
-            </Stack>
-          </Box>
-        </TableCell>
-
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.phoneNumber}</TableCell>
-
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.company}</TableCell>
-
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.role}</TableCell>
-
-        <TableCell>
-          <Label
-            variant="soft"
-            color={
-              (row.status === 'active' && 'success') ||
-              (row.status === 'pending' && 'warning') ||
-              (row.status === 'banned' && 'error') ||
-              'default'
-            }
+        */}
+        <TableCell align="center">{no}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.client_nm}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.case_no}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.case_nm}</TableCell>
+        
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          <a
+            href="https://ssgo.scourt.go.kr/ssgo/index.on"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            {row.status}
-          </Label>
+            ELEC
+          </a>
         </TableCell>
-
-        <TableCell>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Tooltip title="Quick edit" placement="top" arrow>
-              <IconButton
-                color={quickEditForm.value ? 'inherit' : 'default'}
-                onClick={quickEditForm.onTrue}
-              >
-                <Iconify icon="solar:pen-bold" />
-              </IconButton>
-            </Tooltip>
-
-            <IconButton
-              color={menuActions.open ? 'inherit' : 'default'}
-              onClick={menuActions.onOpen}
-            >
-              <Iconify icon="eva:more-vertical-fill" />
-            </IconButton>
-          </Box>
-        </TableCell>
+         <TableCell sx={{ whiteSpace: 'nowrap' }}>{codeLabel}</TableCell>
+        {/** 
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.assignee_id}</TableCell>
+        */}
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.small_class_cd}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}> {dayjs(row.created_at).format('YYYY-MM-DD')}</TableCell>
+        
       </TableRow>
-
+      
+       
       {renderQuickEditForm()}
-      {renderMenuActions()}
-      {renderConfirmDialog()}
+      
     </>
   );
 }

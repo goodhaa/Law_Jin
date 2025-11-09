@@ -1,60 +1,53 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { varAlpha } from 'minimal-shared/utils';
-import { useBoolean, useSetState } from 'minimal-shared/hooks';
+import { useState } from 'react';
+import { useSetState } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import TableBody from '@mui/material/TableBody';
-import IconButton from '@mui/material/IconButton';
 
 import { paths } from 'src/routes/paths';
-import { RouterLink } from 'src/routes/components';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { _roles, _userList, USER_STATUS_OPTIONS } from 'src/_mock';
+import { _roles } from 'src/_mock';
 
-import { Label } from 'src/components/label';
-import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
-import { ConfirmDialog } from 'src/components/custom-dialog';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import {
   useTable,
   emptyRows,
-  rowInPage,
   TableNoData,
   getComparator,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
   TablePaginationCustom,
 } from 'src/components/table';
 
-import { UserTableRow } from '../caseTableRow';
-import { UserTableToolbar } from '../caseTableToolbar';
-import { UserTableFiltersResult } from '../caseTableFiltersResult';
-
+import { CaseTableRow } from '../caseTableRow';
+import { CaseTableToolbar } from '../caseTableToolbar';
+import { CaseTableFiltersResult } from '../caseTableFiltersResult';
+import { getSupabaseBrowser } from 'src/lib/supabase/client';
+import React, { useContext, useEffect } from 'react';
+import { AuthContext } from 'src/auth/context/auth-context';
 // ----------------------------------------------------------------------
 
-const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...USER_STATUS_OPTIONS];
-
 const TABLE_HEAD = [
-  { id: 'name2', label: '사건번호', width: 80 },
-  { id: 'name1', label: '사건명' , width: 180},
-  { id: 'name', label: '의뢰인' },
-  { id: 'phoneNumber', label: '연락처', width: 180 },
-  { id: 'company', label: 'Company', width: 220 },
-  { id: 'role', label: 'Role', width: 180 },
-  { id: 'status', label: 'Status', width: 100 },
-  { id: '', width: 88 },
+  { id: 'no', label: 'No', width: 60 },
+  { id: 'client_nm', label: '의뢰인' },
+  { id: 'case_no', label: '사건번호' },
+  { id: 'case_nm', label: '사건명' },
+  /*
+  { id: 'USER_NM', label: '기일명' },
+  { id: 'USER_NM', label: '진행/잔여일' },
+  { id: 'USER_NM', label: '시간' },
+  { id: 'USER_NM', label: '특이[결과]' },
+   */
+  { id: 'USER_NM', label: '전자' },
+  { id: 'small_class_cd', label: '소분류' },
+  { id: 'assignee_id', label: '수임' },
+  { id: 'created_at', label: '등록일' },
 ];
 
 // ----------------------------------------------------------------------
@@ -62,12 +55,14 @@ const TABLE_HEAD = [
 export function CaseListView() {
   const table = useTable();
 
-  const confirmDialog = useBoolean();
+  const [tableData, setTableData] = useState([]);   // ← 서버 데이터 받을 배열
+  const [loading, setLoading] = useState(true);      // ← 로딩 상태
+  const [error, setError] = useState(null);          // ← 에러 상태
 
-  const [tableData, setTableData] = useState(_userList);
+  const filters = useSetState({ name: '', role: [] });
+  const { state: currentFilters} = filters;
 
-  const filters = useSetState({ name: '', role: [], status: 'all' });
-  const { state: currentFilters, setState: updateFilters } = filters;
+  const { userBase } = useContext(AuthContext); // 로그인된 사용자 정보 가져오기
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -75,139 +70,99 @@ export function CaseListView() {
     filters: currentFilters,
   });
 
-  const dataInPage = rowInPage(dataFiltered, table.page, table.rowsPerPage);
-
   const canReset =
-    !!currentFilters.name || currentFilters.role.length > 0 || currentFilters.status !== 'all';
+    !!currentFilters.name || currentFilters.role.length > 0 ;
 
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
 
-  const handleDeleteRow = useCallback(
-    (id) => {
-      const deleteRow = tableData.filter((row) => row.id !== id);
+   console.log('✅ 로그인된 회원정보:', userBase);
 
-      toast.success('Delete success!');
+  useEffect(() => {
 
-      setTableData(deleteRow);
+    let mounted = true;
 
-      table.onUpdatePageDeleteRow(dataInPage.length);
-    },
-    [dataInPage.length, table, tableData]
-  );
+    const fetchUsers = async () => {
+      setLoading(true);
 
-  const handleDeleteRows = useCallback(() => {
-    const deleteRows = tableData.filter((row) => !table.selected.includes(row.id));
+      try {
+        const supabase = getSupabaseBrowser();
+        const { data, error } = await supabase
+          .from('CASE_BASE')
+          .select('client_nm, case_no, case_nm, small_class_cd, created_at, register_nm')
+          .eq('company_cd', userBase?.COMPANY_CD);
 
-    toast.success('Delete success!');
+        console.log('✅ supabase raw data:', data);
 
-    setTableData(deleteRows);
+        if (error) throw error;
 
-    table.onUpdatePageDeleteRows(dataInPage.length, dataFiltered.length);
-  }, [dataFiltered.length, dataInPage.length, table, tableData]);
-
-  const handleFilterStatus = useCallback(
-    (event, newValue) => {
-      table.onResetPage();
-      updateFilters({ status: newValue });
-    },
-    [updateFilters, table]
-  );
-
-  const renderConfirmDialog = () => (
-    <ConfirmDialog
-      open={confirmDialog.value}
-      onClose={confirmDialog.onFalse}
-      title="Delete"
-      content={
-        <>
-          Are you sure want to delete <strong> {table.selected.length} </strong> items?
-        </>
+        const users = (data || []).map((r) => ({
+          client_nm: r.client_nm ?? '',
+          case_no: r.case_no ?? '',
+          case_nm: r.case_nm ?? '',
+          small_class_cd: r.small_class_cd ?? '',
+          created_at: r.created_at ?? '',
+          register_nm: r.register_nm ?? '',
+        }));
+        
+        if (mounted) setTableData(users);
+      } catch (err) {
+        console.error(err);
+        if (mounted) setError(String(err));
+      } finally {
+        if (mounted) setLoading(false);
       }
-      action={
-        <Button
-          variant="contained"
-          color="error"
-          onClick={() => {
-            handleDeleteRows();
-            confirmDialog.onFalse();
-          }}
-        >
-          Delete
-        </Button>
-      }
-    />
-  );
+    };
+
+  fetchUsers();
+  return () => {
+    mounted = false;
+  };
+}, []);
+  // -------------------
+  // 로딩 / 에러 처리 (useEffect 뒤, 실제 JSX return 전에 위치)
+  // -------------------
+  if (loading) {
+    return (
+      <DashboardContent>
+        <Card sx={{ p: 3 }}>데이터 불러오는 중...</Card>
+      </DashboardContent>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardContent>
+        <Card sx={{ p: 3 }}>에러 발생: {error}</Card>
+      </DashboardContent>
+    );
+  }
+
 
   return (
     <>
       <DashboardContent>
+        
         <CustomBreadcrumbs
-          heading="List"
+          heading="사건 목록"
           links={[
             { name: 'Dashboard', href: paths.dashboard.root },
-            { name: 'User', href: paths.dashboard.user.root },
-            { name: 'List' },
+            { name: '사건', href: paths.dashboard.case.root },
+            { name: '목록' },
           ]}
-          action={
-            <Button
-              component={RouterLink}
-              href={paths.dashboard.case.new}
-              variant="contained"
-              startIcon={<Iconify icon="mingcute:add-line" />}
-            >
-              신건 등록
-            </Button>
-          }
           sx={{ mb: { xs: 3, md: 5 } }}
         />
 
         <Card>
-          <Tabs
-            value={currentFilters.status}
-            onChange={handleFilterStatus}
-            sx={[
-              (theme) => ({
-                px: { md: 2.5 },
-                boxShadow: `inset 0 -2px 0 0 ${varAlpha(theme.vars.palette.grey['500Channel'], 0.08)}`,
-              }),
-            ]}
-          >
-            {STATUS_OPTIONS.map((tab) => (
-              <Tab
-                key={tab.value}
-                iconPosition="end"
-                value={tab.value}
-                label={tab.label}
-                icon={
-                  <Label
-                    variant={
-                      ((tab.value === 'all' || tab.value === currentFilters.status) && 'filled') ||
-                      'soft'
-                    }
-                    color={
-                      (tab.value === 'active' && 'success') ||
-                      (tab.value === 'pending' && 'warning') ||
-                      (tab.value === 'banned' && 'error') ||
-                      'default'
-                    }
-                  >
-                    {['active', 'pending', 'banned', 'rejected'].includes(tab.value)
-                      ? tableData.filter((user) => user.status === tab.value).length
-                      : tableData.length}
-                  </Label>
-                }
-              />
-            ))}
-          </Tabs>
-
-          <UserTableToolbar
+          {/* 검색바 시작 */}
+          
+          <CaseTableToolbar
             filters={filters}
             onResetPage={table.onResetPage}
             options={{ roles: _roles }}
           />
 
           {canReset && (
-            <UserTableFiltersResult
+            <CaseTableFiltersResult
               filters={filters}
               totalResults={dataFiltered.length}
               onResetPage={table.onResetPage}
@@ -215,41 +170,16 @@ export function CaseListView() {
             />
           )}
 
-          <Box sx={{ position: 'relative' }}>
-            <TableSelectedAction
-              dense={table.dense}
-              numSelected={table.selected.length}
-              rowCount={dataFiltered.length}
-              onSelectAllRows={(checked) =>
-                table.onSelectAllRows(
-                  checked,
-                  dataFiltered.map((row) => row.id)
-                )
-              }
-              action={
-                <Tooltip title="Delete">
-                  <IconButton color="primary" onClick={confirmDialog.onTrue}>
-                    <Iconify icon="solar:trash-bin-trash-bold" />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
-
+          {/* 검색바 끝 */}
+          
+          <Box sx={{ position: 'relative' }}>           
             <Scrollbar>
-              <Table size={table.dense ? 'small' : 'medium'} sx={{ minWidth: 960 }}>
+              <Table size={table.dense ? 'small' : 'medium'} sx={{ minWidth: 960, '& .MuiTableCell-root': { textAlign: 'center' }, }}>
                 <TableHeadCustom
                   order={table.order}
                   orderBy={table.orderBy}
                   headCells={TABLE_HEAD}
-                  rowCount={dataFiltered.length}
-                  numSelected={table.selected.length}
                   onSort={table.onSort}
-                  onSelectAllRows={(checked) =>
-                    table.onSelectAllRows(
-                      checked,
-                      dataFiltered.map((row) => row.id)
-                    )
-                  }
                 />
 
                 <TableBody>
@@ -258,28 +188,33 @@ export function CaseListView() {
                       table.page * table.rowsPerPage,
                       table.page * table.rowsPerPage + table.rowsPerPage
                     )
-                    .map((row) => (
-                      <UserTableRow
+                    .map((row, index) => {
+                     const no = table.page * table.rowsPerPage + index + 1;
+                     return (
+                      <CaseTableRow
                         key={row.id}
                         row={row}
-                        selected={table.selected.includes(row.id)}
-                        onSelectRow={() => table.onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
-                        editHref={paths.dashboard.user.edit(row.id)}
+                        no={no}
                       />
-                    ))}
+                    );
+                  })}
 
+                  {/** 테이블의 행 높이를 맞춰주는 역할 */}
                   <TableEmptyRows
                     height={table.dense ? 56 : 56 + 20}
                     emptyRows={emptyRows(table.page, table.rowsPerPage, dataFiltered.length)}
                   />
 
+                  {/**화면에 "검색 결과 없음" 같은 표시를 보여줌 */}
                   <TableNoData notFound={notFound} />
                 </TableBody>
+                
               </Table>
             </Scrollbar>
+            
           </Box>
 
+          {/** 페이지 바 시작 */}
           <TablePaginationCustom
             page={table.page}
             dense={table.dense}
@@ -289,10 +224,9 @@ export function CaseListView() {
             onChangeDense={table.onChangeDense}
             onRowsPerPageChange={table.onChangeRowsPerPage}
           />
+          {/** 페이지 바 끝 */}
         </Card>
       </DashboardContent>
-
-      {renderConfirmDialog()}
     </>
   );
 }
@@ -300,7 +234,7 @@ export function CaseListView() {
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {
-  const { name, status, role } = filters;
+  const { name, role } = filters;
 
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
@@ -313,15 +247,11 @@ function applyFilter({ inputData, comparator, filters }) {
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (name) {
-    inputData = inputData.filter((user) => user.name.toLowerCase().includes(name.toLowerCase()));
-  }
-
-  if (status !== 'all') {
-    inputData = inputData.filter((user) => user.status === status);
+    inputData = inputData.filter((user) => user.USER_NM.toLowerCase().includes(name.toLowerCase()));
   }
 
   if (role.length) {
-    inputData = inputData.filter((user) => role.includes(user.role));
+    inputData = inputData.filter((user) => role.includes(user.ROLE));
   }
 
   return inputData;

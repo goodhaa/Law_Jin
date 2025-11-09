@@ -17,7 +17,7 @@ import { CustomPopover } from 'src/components/custom-popover';
 
 // ----------------------------------------------------------------------
 
-export function UserTableToolbar({ filters, options, onResetPage }) {
+export function CaseTableToolbar({ filters, options, onResetPage }) {
   const menuActions = usePopover();
 
   const { state: currentFilters, setState: updateFilters } = filters;
@@ -40,7 +40,7 @@ export function UserTableToolbar({ filters, options, onResetPage }) {
     },
     [onResetPage, updateFilters]
   );
-
+ /*
   const renderMenuActions = () => (
     <CustomPopover
       open={menuActions.open}
@@ -66,6 +66,7 @@ export function UserTableToolbar({ filters, options, onResetPage }) {
       </MenuList>
     </CustomPopover>
   );
+  */
 
   return (
     <>
@@ -80,7 +81,7 @@ export function UserTableToolbar({ filters, options, onResetPage }) {
         }}
       >
         <FormControl sx={{ flexShrink: 0, width: { xs: 1, md: 200 } }}>
-          <InputLabel htmlFor="filter-role-select">Role</InputLabel>
+          <InputLabel htmlFor="filter-role-select">직책</InputLabel>
           <Select
             multiple
             label="Role"
@@ -119,7 +120,7 @@ export function UserTableToolbar({ filters, options, onResetPage }) {
             fullWidth
             value={currentFilters.name}
             onChange={handleFilterName}
-            placeholder="Search..."
+            placeholder="사용자 검색..."
             slotProps={{
               input: {
                 startAdornment: (
@@ -130,14 +131,15 @@ export function UserTableToolbar({ filters, options, onResetPage }) {
               },
             }}
           />
-
+           {/**
           <IconButton onClick={menuActions.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
+          */}
         </Box>
       </Box>
+      {/**       {renderMenuActions()}*/}
 
-      {renderMenuActions()}
     </>
   );
 }
