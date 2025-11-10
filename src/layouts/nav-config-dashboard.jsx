@@ -138,6 +138,7 @@ export const navData = [
           { title: 'Edit', path: paths.dashboard.invoice.demo.edit },
         ],
       },
+      
       {
         title: 'Blog',
         path: paths.dashboard.post.root,

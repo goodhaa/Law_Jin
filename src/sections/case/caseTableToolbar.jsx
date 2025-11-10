@@ -1,24 +1,24 @@
 import { useCallback } from 'react';
-import { usePopover } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
 import Select from '@mui/material/Select';
-import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
-import IconButton from '@mui/material/IconButton';
 import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import { Iconify } from 'src/components/iconify';
-import { CustomPopover } from 'src/components/custom-popover';
-
+import { formHelperTextClasses } from '@mui/material/FormHelperText';
+import { useCodes } from 'src/hooks/useCodes';
+import dayjs from 'dayjs'
 // ----------------------------------------------------------------------
 
-export function CaseTableToolbar({ filters, options, onResetPage }) {
-  const menuActions = usePopover();
+export function CaseTableToolbar({ filters, dateError, onResetPage }) {
+
+  const { codes: smallClassCodes } = useCodes('SMALL_CLASS'); // ✅ 소분류 코드 가져오기
 
   const { state: currentFilters, setState: updateFilters } = filters;
 
@@ -30,43 +30,45 @@ export function CaseTableToolbar({ filters, options, onResetPage }) {
     [onResetPage, updateFilters]
   );
 
-  const handleFilterRole = useCallback(
-    (event) => {
-      const newValue =
-        typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value;
-
+  const handleFilterStartDate = useCallback(
+    (newValue) => {
       onResetPage();
-      updateFilters({ role: newValue });
+      if (newValue) {
+        // Dayjs 객체로 변환 + 시간 조정 (시작일은 00:00:00로)
+        const adjustedDate = dayjs(newValue).startOf('day');
+        updateFilters({ startDate: adjustedDate });
+      } else {
+        updateFilters({ startDate: null });
+      }
     },
     [onResetPage, updateFilters]
   );
- /*
-  const renderMenuActions = () => (
-    <CustomPopover
-      open={menuActions.open}
-      anchorEl={menuActions.anchorEl}
-      onClose={menuActions.onClose}
-      slotProps={{ arrow: { placement: 'right-top' } }}
-    >
-      <MenuList>
-        <MenuItem onClick={() => menuActions.onClose()}>
-          <Iconify icon="solar:printer-minimalistic-bold" />
-          Print
-        </MenuItem>
-
-        <MenuItem onClick={() => menuActions.onClose()}>
-          <Iconify icon="solar:import-bold" />
-          Import
-        </MenuItem>
-
-        <MenuItem onClick={() => menuActions.onClose()}>
-          <Iconify icon="solar:export-bold" />
-          Export
-        </MenuItem>
-      </MenuList>
-    </CustomPopover>
+  
+  const handleFilterEndDate = useCallback(
+    (newValue) => {
+      onResetPage();
+      if (newValue) {
+        // Dayjs 객체로 변환 + 시간 조정
+        const adjustedDate = dayjs(newValue).endOf('day'); // 23:59:59로 맞춤
+        updateFilters({ endDate: adjustedDate });
+      } else {
+        updateFilters({ endDate: null });
+      }
+    },
+    [onResetPage, updateFilters]
   );
-  */
+
+  const handleFilterSmallClass = (event) => {
+    const {
+      target: { value },
+    } = event;
+    // MUI Select multiple에서 value가 string으로 올 수도 있으니 방어적으로 처리
+    filters.setState({
+      smallClass: typeof value === 'string' ? value.split(',') : value,
+    });
+    // 만약 페이지를 리셋해야 하면 호출 (table.onResetPage 등)
+    if (typeof onResetPage === 'function') onResetPage();
+  };
 
   return (
     <>
@@ -81,31 +83,61 @@ export function CaseTableToolbar({ filters, options, onResetPage }) {
         }}
       >
         <FormControl sx={{ flexShrink: 0, width: { xs: 1, md: 200 } }}>
-          <InputLabel htmlFor="filter-role-select">직책</InputLabel>
+          <InputLabel htmlFor="filter-small-class-select">소분류</InputLabel>
           <Select
             multiple
-            label="Role"
-            value={currentFilters.role}
-            onChange={handleFilterRole}
-            renderValue={(selected) => selected.map((value) => value).join(', ')}
-            inputProps={{ id: 'filter-role-select' }}
+            label="소분류"
+            value={currentFilters.smallClass || []}
+            onChange={handleFilterSmallClass}
+            renderValue={(selected) =>
+              (selected || [])
+                .map((code) => smallClassCodes.find((c) => c.code === code)?.code_nm ?? code)
+                .join(', ')
+            }
+            inputProps={{ id: 'filter-small-class-select' }}
             MenuProps={{
               slotProps: { paper: { sx: { maxHeight: 240 } } },
             }}
           >
-            {options.roles.map((option) => (
-              <MenuItem key={option} value={option}>
+            {smallClassCodes.map((option) => (
+              <MenuItem key={option.code} value={option.code}>
                 <Checkbox
                   disableRipple
                   size="small"
-                  checked={currentFilters.role.includes(option)}
-                  slotProps={{ input: { id: `${option}-checkbox` } }}
+                  checked={(currentFilters.smallClass || []).includes(option.code)}
+                  slotProps={{ input: { id: `${option.code}-checkbox` } }}
                 />
-                {option}
+                {option.code_nm}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
+        
+        <DatePicker
+          label="시작일"
+          value={currentFilters.startDate || null}
+          onChange={handleFilterStartDate}
+          sx={{ maxWidth: { md: 180 } }}
+        />
+
+        <DatePicker
+          label="종료일"
+          value={currentFilters.endDate || null}
+          onChange={handleFilterEndDate}
+          slotProps={{
+            textField: {
+              error: dateError,
+              helperText: dateError ? 'End date must be later than start date' : null,
+            },
+          }}
+          sx={{
+            maxWidth: { md: 180 },
+            [`& .${formHelperTextClasses.root}`]: {
+              bottom: { md: -40 },
+              position: { md: 'absolute' },
+            },
+          }}
+        />
 
         <Box
           sx={{
@@ -120,7 +152,7 @@ export function CaseTableToolbar({ filters, options, onResetPage }) {
             fullWidth
             value={currentFilters.name}
             onChange={handleFilterName}
-            placeholder="사용자 검색..."
+            placeholder="의뢰인, 사건번호, 사건명 검색..."
             slotProps={{
               input: {
                 startAdornment: (
@@ -131,14 +163,8 @@ export function CaseTableToolbar({ filters, options, onResetPage }) {
               },
             }}
           />
-           {/**
-          <IconButton onClick={menuActions.onOpen}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
-          */}
         </Box>
       </Box>
-      {/**       {renderMenuActions()}*/}
 
     </>
   );

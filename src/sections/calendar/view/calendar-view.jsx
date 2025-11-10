@@ -108,7 +108,7 @@ export function CalendarView() {
       }}
     >
       <DialogTitle sx={{ minHeight: 76 }}>
-        {openForm && <> {currentEvent?.id ? 'Edit' : 'Add'} event</>}
+        {openForm && <> 일정 {currentEvent?.id ? '수정' : '추가'} </>}
       </DialogTitle>
 
       <CalendarForm
@@ -151,13 +151,13 @@ export function CalendarView() {
             mb: { xs: 3, md: 5 },
           }}
         >
-          <Typography variant="h4">Calendar</Typography>
+          <Typography variant="h4">일정 관리</Typography>
           <Button
             variant="contained"
             startIcon={<Iconify icon="mingcute:add-line" />}
             onClick={onOpenForm}
           >
-            Add event
+            일정 추가
           </Button>
         </Box>
 
@@ -188,7 +188,7 @@ export function CalendarView() {
               selectable
               allDayMaintainDuration
               eventResizableFromStart
-              firstDay={1}
+              firstDay={0}
               aspectRatio={3}
               dayMaxEvents={3}
               eventMaxStack={2}
@@ -197,7 +197,7 @@ export function CalendarView() {
               eventDisplay="block"
               ref={calendarRef}
               initialView={view}
-              events={dataFiltered}
+              //events={dataFiltered} 일정 내용
               select={onSelectRange}
               eventClick={onClickEvent}
               businessHours={{

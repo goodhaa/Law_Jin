@@ -121,7 +121,7 @@ export function CalendarToolbar({
         variant="contained"
         onClick={() => onDateNavigation?.('today')}
       >
-        Today
+        오늘
       </Button>
 
       <IconButton onClick={onOpenFilters}>

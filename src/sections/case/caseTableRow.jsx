@@ -1,24 +1,7 @@
-import { useBoolean, usePopover } from 'minimal-shared/hooks';
+import { useBoolean } from 'minimal-shared/hooks';
 
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Avatar from '@mui/material/Avatar';
-import Tooltip from '@mui/material/Tooltip';
-import MenuList from '@mui/material/MenuList';
-import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
 import TableCell from '@mui/material/TableCell';
-import IconButton from '@mui/material/IconButton';
-
-import { RouterLink } from 'src/routes/components';
-
-import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
-import { ConfirmDialog } from 'src/components/custom-dialog';
-import { CustomPopover } from 'src/components/custom-popover';
 
 import { UserQuickEditForm } from './user-quick-edit-form';
 import dayjs from 'dayjs';
@@ -74,11 +57,20 @@ export function CaseTableRow({ row, no, selected }) {
             ELEC
           </a>
         </TableCell>
-         <TableCell sx={{ whiteSpace: 'nowrap' }}>{codeLabel}</TableCell>
-        {/** 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.assignee_id}</TableCell>
-        */}
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.small_class_cd}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{codeLabel}</TableCell>
+    
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          {Array.isArray(row.assignees) && row.assignees.length > 0
+            ? row.assignees.map((a) => a.USER_NM).join(', ')
+            : '-'}
+        </TableCell>
+
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          {Array.isArray(row.personInCharge) && row.personInCharge.length > 0
+            ? row.personInCharge.map((p) => p.USER_NM).join(', ')
+            : '-'}
+        </TableCell>
+
         <TableCell sx={{ whiteSpace: 'nowrap' }}> {dayjs(row.created_at).format('YYYY-MM-DD')}</TableCell>
         
       </TableRow>

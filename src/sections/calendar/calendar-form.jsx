@@ -102,13 +102,13 @@ export function CalendarForm({ currentEvent, colorOptions, onClose }) {
     <Form methods={methods} onSubmit={onSubmit}>
       <Scrollbar sx={{ p: 3, bgcolor: 'background.neutral' }}>
         <Stack spacing={3}>
-          <Field.Text name="title" label="Title" />
-          <Field.Text name="description" label="Description" multiline rows={3} />
-          <Field.Switch name="allDay" label="All day" />
-          <Field.DateTimePicker name="start" label="Start date" />
+          <Field.Text name="title" label="제목" />
+          <Field.Text name="description" label="내용" multiline rows={3} />
+          <Field.Switch name="allDay" label="하루종일" />
+          <Field.DateTimePicker name="start" label="시작일" />
           <Field.DateTimePicker
             name="end"
-            label="End date"
+            label="종료일"
             slotProps={{
               textField: {
                 error: dateError,
@@ -143,10 +143,10 @@ export function CalendarForm({ currentEvent, colorOptions, onClose }) {
         <Box component="span" sx={{ flexGrow: 1 }} />
 
         <Button variant="outlined" color="inherit" onClick={onClose}>
-          Cancel
+          취소
         </Button>
         <Button type="submit" variant="contained" loading={isSubmitting} disabled={dateError}>
-          {currentEvent?.id ? 'Save changes' : 'Create'}
+          {currentEvent?.id ? '일정 변경' : '일정 생성'}
         </Button>
       </DialogActions>
     </Form>

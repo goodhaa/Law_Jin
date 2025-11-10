@@ -23,12 +23,13 @@ import { AppAreaInstalled } from '../app-area-installed';
 import { AppWidgetSummary } from '../app-widget-summary';
 import { AppCurrentDownload } from '../app-current-download';
 import { AppTopInstalledCountries } from '../app-top-installed-countries';
-
+import { useRouter } from 'src/routes/hooks';
+import { paths } from 'src/routes/paths';
 // ----------------------------------------------------------------------
 
 export function OverviewAppView() {
   const { user } = useAuthContext();
-
+  const router = useRouter();
   const theme = useTheme();
 
   return (
@@ -40,7 +41,11 @@ export function OverviewAppView() {
            // description="If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything."
            // img={<SeoIllustration hideBackground />}
             action={
-              <Button variant="contained" color="primary">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => router.push(paths.dashboard.case.root)}
+              >
                 바로가기
               </Button>
             }

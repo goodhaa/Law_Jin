@@ -24,6 +24,7 @@ import {
   TableHeadCustom,
   TablePaginationCustom,
 } from 'src/components/table';
+import { fIsAfter, fIsBetween } from 'src/utils/format-time';
 
 import { CaseTableRow } from '../caseTableRow';
 import { CaseTableToolbar } from '../caseTableToolbar';
@@ -38,15 +39,10 @@ const TABLE_HEAD = [
   { id: 'client_nm', label: '의뢰인' },
   { id: 'case_no', label: '사건번호' },
   { id: 'case_nm', label: '사건명' },
-  /*
-  { id: 'USER_NM', label: '기일명' },
-  { id: 'USER_NM', label: '진행/잔여일' },
-  { id: 'USER_NM', label: '시간' },
-  { id: 'USER_NM', label: '특이[결과]' },
-   */
   { id: 'USER_NM', label: '전자' },
   { id: 'small_class_cd', label: '소분류' },
-  { id: 'assignee_id', label: '수임' },
+  { id: 'assignee_id', label: '수임자' },
+  { id: 'person_in_charge_id', label: '담당자' }, // ✅ 추가
   { id: 'created_at', label: '등록일' },
 ];
 
@@ -55,27 +51,37 @@ const TABLE_HEAD = [
 export function CaseListView() {
   const table = useTable();
 
-  const [tableData, setTableData] = useState([]);   // ← 서버 데이터 받을 배열
-  const [loading, setLoading] = useState(true);      // ← 로딩 상태
-  const [error, setError] = useState(null);          // ← 에러 상태
+  const [tableData, setTableData] = useState([]); // ← 서버 데이터 받을 배열
+  const [loading, setLoading] = useState(true);   // ← 로딩 상태
+  const [error, setError] = useState(null);       // ← 에러 상태
 
-  const filters = useSetState({ name: '', role: [] });
+  const filters = useSetState({ 
+      name: '', 
+      smallClass: [], 
+      startDate: null,
+      endDate: null, 
+  });
+
   const { state: currentFilters} = filters;
 
   const { userBase } = useContext(AuthContext); // 로그인된 사용자 정보 가져오기
+
+  const dateError = fIsAfter(currentFilters.startDate, currentFilters.endDate);
 
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(table.order, table.orderBy),
     filters: currentFilters,
+    dateError,
   });
 
   const canReset =
-    !!currentFilters.name || currentFilters.role.length > 0 ;
+    !!currentFilters.name || 
+    currentFilters.smallClass.length > 0 ||
+    (!!currentFilters.startDate && !!currentFilters.endDate);
+
 
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
-
-   console.log('✅ 로그인된 회원정보:', userBase);
 
   useEffect(() => {
 
@@ -88,21 +94,54 @@ export function CaseListView() {
         const supabase = getSupabaseBrowser();
         const { data, error } = await supabase
           .from('CASE_BASE')
-          .select('client_nm, case_no, case_nm, small_class_cd, created_at, register_nm')
+          .select('case_id, client_nm, case_no, case_nm, small_class_cd, created_at, assignee_id, person_in_charge_id, register_nm')
           .eq('company_cd', userBase?.COMPANY_CD);
 
         console.log('✅ supabase raw data:', data);
 
         if (error) throw error;
 
-        const users = (data || []).map((r) => ({
-          client_nm: r.client_nm ?? '',
-          case_no: r.case_no ?? '',
-          case_nm: r.case_nm ?? '',
-          small_class_cd: r.small_class_cd ?? '',
-          created_at: r.created_at ?? '',
-          register_nm: r.register_nm ?? '',
-        }));
+        const users = (data || []).map((r) => {
+          // assignee_id 파싱
+          let assignees = [];
+          try {
+            if (r.assignee_id) {
+              assignees = typeof r.assignee_id === 'string'
+                ? JSON.parse(r.assignee_id)
+                : Array.isArray(r.assignee_id)
+                  ? r.assignee_id
+                  : [];
+            }
+          } catch (e) {
+            console.warn('assignee_id parse error:', e);
+          }
+
+          // person_in_charge_id 파싱
+          let personInCharge = [];
+          try {
+            if (r.person_in_charge_id) {
+              personInCharge = typeof r.person_in_charge_id === 'string'
+                ? JSON.parse(r.person_in_charge_id)
+                : Array.isArray(r.person_in_charge_id)
+                  ? r.person_in_charge_id
+                  : [];
+            }
+          } catch (e) {
+            console.warn('person_in_charge_id parse error:', e);
+          }
+          
+          return {
+            id: r.case_id,
+            client_nm: r.client_nm ?? '',
+            case_no: r.case_no ?? '',
+            case_nm: r.case_nm ?? '',
+            small_class_cd: r.small_class_cd ?? '',
+            created_at: r.created_at ?? '',
+            register_nm: r.register_nm ?? '',
+            assignees,          // 수임자 배열 저장
+            personInCharge,     // 담당자 배열 저장
+          };
+        });
         
         if (mounted) setTableData(users);
       } catch (err) {
@@ -157,8 +196,9 @@ export function CaseListView() {
           
           <CaseTableToolbar
             filters={filters}
+            dateError={dateError}
             onResetPage={table.onResetPage}
-            options={{ roles: _roles }}
+            //options={{ roles: _roles }}
           />
 
           {canReset && (
@@ -233,8 +273,8 @@ export function CaseListView() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filters }) {
-  const { name, role } = filters;
+function applyFilter({ inputData, comparator, filters, dateError }) {
+  const { name, smallClass, startDate, endDate } = filters;
 
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
@@ -247,12 +287,28 @@ function applyFilter({ inputData, comparator, filters }) {
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (name) {
-    inputData = inputData.filter((user) => user.USER_NM.toLowerCase().includes(name.toLowerCase()));
+    const lowerName = name.toLowerCase();
+    inputData = inputData.filter((item) =>
+      (item.client_nm ?? '').toLowerCase().includes(lowerName) ||
+      (item.case_nm ?? '').toLowerCase().includes(lowerName) ||
+      (item.case_no ?? '').toLowerCase().includes(lowerName)
+    );
   }
 
-  if (role.length) {
-    inputData = inputData.filter((user) => role.includes(user.ROLE));
+  // ✅ 소분류 코드 필터링
+  if (smallClass?.length) {
+      inputData = inputData.filter((item) =>
+      smallClass.includes(item.small_class_cd)
+    );
   }
 
+
+  if (!dateError) {
+    if (startDate && endDate) {
+      inputData = inputData.filter(
+        (item) => fIsBetween(new Date(item.created_at), startDate, endDate)
+      );
+    }
+  }
   return inputData;
 }
