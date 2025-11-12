@@ -27,7 +27,7 @@ export const signInWithPassword = async ({ email, password }) => {
 /** **************************************
  * 회원가입
  *************************************** */
-export const signUp = async ({ email, password, userName }) => {
+export const signUp = async ({ email, password, userName, companyCd, companyNm}) => {
   const supabase = getSupabaseBrowser();
 
   const { data, error } = await supabase.auth.signUp({

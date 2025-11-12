@@ -89,7 +89,7 @@ export function CustomDateRangePicker({
 
         {error && (
           <FormHelperText error sx={{ px: 2 }}>
-            End date must be later than start date
+            종료 날짜는 시작 날짜 이후여야 합니다.
           </FormHelperText>
         )}
       </DialogContent>

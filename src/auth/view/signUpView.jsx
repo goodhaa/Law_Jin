@@ -24,7 +24,7 @@ import { getErrorMessage } from '../utils';
 import { signUp } from '../context/supabase';
 import { FormHead } from '../components/form-head';
 import { SignUpTerms } from '../components/sign-up-terms';
-
+import CompanyPickerDialog from './companyPickerDialog';
 // ----------------------------------------------------------------------
 
 export const SignUpSchema = z.object({
@@ -37,6 +37,8 @@ export const SignUpSchema = z.object({
   passwordCheck: z
     .string()
     .min(1, { error: '비밀번호 확인을 입력하세요!' }),
+  company_cd: z.string().min(1, { error: '회사코드를 입력하거나 검색에서 선택하세요!' }),
+  company_nm: z.string().min(1, { error: '회사명을 입력하거나 검색에서 선택하세요!' }),  
 }).refine(
   (d) => {
     // 둘 다 비어있거나 하나라도 비어있으면 ‘일치’ 검사는 패스(= 에러 내지 않음)
@@ -61,6 +63,8 @@ export function SupabaseSignUpView() {
     email: '',
     password: '',
     passwordCheck: '',
+    company_cd: '',   
+    company_nm: '',  
   };
 
   const methods = useForm({
@@ -71,10 +75,14 @@ export function SupabaseSignUpView() {
   });
 
   const {
-  control,
-  trigger,
-  formState: { touchedFields, dirtyFields },
-} = methods;
+    control,
+    trigger,
+    setValue,
+    formState: { touchedFields, dirtyFields },
+  } = methods;
+
+  // 회사 선택 다이얼로그 열림 상태
+  const pickerOpen = useBoolean(false);
 
   // 비밀번호, 비밀번호 확인 값 입력시 실시간 체크 로직 Start
   const pw  = useWatch({ control, name: 'password' });
@@ -82,7 +90,11 @@ export function SupabaseSignUpView() {
 
   useEffect(() => {
     // ❶ 두 필드 중 하나라도 ‘입력 상호작용’이 있었고
-    const interacted = dirtyFields.password || dirtyFields.passwordCheck || touchedFields.password || touchedFields.passwordCheck;
+    const interacted = 
+        dirtyFields.password || 
+        dirtyFields.passwordCheck || 
+        touchedFields.password || 
+        touchedFields.passwordCheck;
 
     // ❷ 두 칸 모두 값이 있을 때만(= 일치검사 의미가 있을 때만) 재검증
     if (interacted && pw !== '' && pwc !== '') {
@@ -98,7 +110,7 @@ export function SupabaseSignUpView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      // (이중 방어) 제출 직전에 한 번 더 확인
+      
       if (data.password !== data.passwordCheck) {
         setErrorMessage('비밀번호가 일치하지 않습니다.');
         return;
@@ -108,6 +120,8 @@ export function SupabaseSignUpView() {
         email: data.email,
         password: data.password,
         userName: data.userName,
+        companyCd: data.company_cd,
+        companyNm: data.company_nm,
       });
       
       router.push(paths.auth.supabase.verify); // 회원가입 클릭후 이동할 화면페이지
@@ -117,6 +131,12 @@ export function SupabaseSignUpView() {
       setErrorMessage(feedbackMessage);
     }
   });
+
+  const onCompanyPick = (c) => {
+    // 다이얼로그에서 선택 시 부모 폼 자동 기입
+    setValue('company_cd', c.company_cd, { shouldDirty: true, shouldValidate: true });
+    setValue('company_nm', c.company_nm, { shouldDirty: true, shouldValidate: true });
+  };
 
   const renderForm = () => (
     <Box sx={{ gap: 3, display: 'flex', flexDirection: 'column' }}>
@@ -129,6 +149,33 @@ export function SupabaseSignUpView() {
           slotProps={{ inputLabel: { shrink: true } }}
         />
       </Box>
+
+      {/* ✅ 회사코드 / 회사명 (검색 버튼으로 자동 기입) */}
+      <Field.Text
+        name="company_cd"
+        label="회사코드"
+        slotProps={{ inputLabel: { shrink: true } }}
+        sx={{ display: 'none' }}
+        // disabled  // 필요하면 수정 불가 처리
+      />
+
+      <Field.Text
+        name="company_nm"
+        label="회사명"
+        slotProps={{
+          inputLabel: { shrink: true },
+          input: {
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={pickerOpen.onTrue} edge="end" aria-label="회사 검색">
+                  <Iconify icon="solar:magnifer-linear" />
+                </IconButton>
+              </InputAdornment>
+            ),
+          },
+        }}
+        placeholder="검색 버튼으로 선택하세요"
+      />
 
       <Field.Text name="email" label="Email" slotProps={{ inputLabel: { shrink: true } }} />
 
@@ -154,22 +201,9 @@ export function SupabaseSignUpView() {
       <Field.Text
         name="passwordCheck"
         label="비밀번호 확인"
-        //placeholder="6+ characters"
         type={showPassword.value ? 'text' : 'password'}
         slotProps={{
           inputLabel: { shrink: true },
-          
-          /*
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={showPassword.onToggle} edge="end">
-                  <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-          */
         }}
       />
 
@@ -213,7 +247,12 @@ export function SupabaseSignUpView() {
         }
         sx={{ textAlign: { xs: 'center', md: 'left' } }}
       />
-
+       {/* 회사 검색 다이얼로그 */}
+      <CompanyPickerDialog
+        open={pickerOpen.value}
+        onClose={pickerOpen.onFalse}
+        onSelect={onCompanyPick}
+      />
       {/* <SignUpTerms /> */}
     </>
   );

@@ -132,7 +132,7 @@ export function CalendarFilters({
         slotProps={{
           textField: {
             error: dateError,
-            helperText: dateError ? 'End date must be later than start date' : null,
+            helperText: dateError ? '종료 날짜는 시작 날짜 이후여야 합니다.' : null,
           },
         }}
       />

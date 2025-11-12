@@ -16,9 +16,9 @@ export function AuthSplitSection({
   method,
   methods,
   layoutQuery = 'md',
-  title = 'Manage the job',
+  title = '스마트한 법무관리의 시작',
   imgUrl = `${CONFIG.assetsDir}/assets/illustrations/illustration-dashboard.webp`,
-  subtitle = 'More effectively with optimized workflows.',
+  subtitle = '모든 업무를 한곳에서 관리하세요',
   ...other
 }) {
   return (
@@ -68,7 +68,7 @@ export function AuthSplitSection({
         src={imgUrl}
         sx={{ width: 1, aspectRatio: '4/3', objectFit: 'cover' }}
       />
-
+      {/*
       {!!methods?.length && method && (
         <Box component="ul" sx={{ gap: 2, display: 'flex' }}>
           {methods.map((option) => {
@@ -104,6 +104,7 @@ export function AuthSplitSection({
           })}
         </Box>
       )}
+        */}
     </Box>
   );
 }

@@ -11,7 +11,6 @@ import TableBody from '@mui/material/TableBody';
 import { paths } from 'src/routes/paths';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { _roles } from 'src/_mock';
 
 import { Scrollbar } from 'src/components/scrollbar';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
@@ -198,7 +197,6 @@ export function CaseListView() {
             filters={filters}
             dateError={dateError}
             onResetPage={table.onResetPage}
-            //options={{ roles: _roles }}
           />
 
           {canReset && (

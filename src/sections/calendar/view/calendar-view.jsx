@@ -39,8 +39,8 @@ export function CalendarView() {
 
   const openFilters = useBoolean();
 
-  const { events, eventsLoading } = useGetEvents();
-
+  const { events, eventsValidating } = useGetEvents();
+  console.log('🟣 [CalendarView] SWR events', events?.length, events);
   const filters = useSetState({ colors: [], startDate: null, endDate: null });
   const { state: currentFilters } = filters;
 
@@ -68,6 +68,8 @@ export function CalendarView() {
     /********/
     onClickEventInFilters,
   } = useCalendar();
+
+  
 
   const currentEvent = useEvent(events, selectedEventId, selectedRange, openForm);
 
@@ -169,7 +171,7 @@ export function CalendarView() {
               view={view}
               title={title}
               canReset={canReset}
-              loading={eventsLoading}
+              loading={eventsValidating}
               onChangeView={onChangeView}
               onDateNavigation={onDateNavigation}
               onOpenFilters={openFilters.onTrue}
@@ -197,7 +199,7 @@ export function CalendarView() {
               eventDisplay="block"
               ref={calendarRef}
               initialView={view}
-              //events={dataFiltered} 일정 내용
+              events={dataFiltered} 
               select={onSelectRange}
               eventClick={onClickEvent}
               businessHours={{

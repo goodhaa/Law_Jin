@@ -9,9 +9,6 @@ import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import Switch from '@mui/material/Switch';
-import Typography from '@mui/material/Typography';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
@@ -22,20 +19,14 @@ import { MenuItem } from '@mui/material';
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
-import { fData } from 'src/utils/format-number';
-
-import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 import { useAuthContext } from 'src/auth/hooks';
-import { _tags, _tourGuides, TOUR_SERVICE_OPTIONS } from 'src/_mock';
 
 // 담당자선정
 import Chip from '@mui/material/Chip';
 
 import { getSupabaseBrowser } from 'src/lib/supabase/client';
-import React, { useContext, useEffect, useState } from 'react';
-import { DashboardContent } from 'src/layouts/dashboard';
 import { useCodes } from 'src/hooks/useCodes'; // 공통코드
 import { useUsers } from 'src/hooks/useUsers'; // 사용자리스트
 // ----------------------------------------------------------------------
@@ -62,11 +53,7 @@ export const UserCreateSchema = z.object({
   telephone: z.string().optional(),
   fax: z.string().optional(),
   address: z.string().optional(),
-
-  // 여기부터 배열 정의 (빈 배열 허용, 요소는 {id, name})
-  //assignee_id: z.string().array().min(1, { error: '최소 한 명 이상의 수임자를 선택해야 합니다!' }),
-  //person_in_charge_id: z.string().array().min(1, { error: '최소 한 명 이상의 담당자를 지정해야 합니다!' }),
-
+  company_cd: z.string().optional(),
   assignee_id: z.array( z.object({ 
             USER_ID: z.string(), 
             USER_NM: z.string(),
@@ -75,7 +62,7 @@ export const UserCreateSchema = z.object({
             USER_ID: z.string(), 
             USER_NM: z.string(),
           })).min(1, { error: '최소 한 명 이상의 담당자를 선택해야 합니다!' }),    
-  company_cd: z.string().optional(),
+  
 });
 
 // ----------------------------------------------------------------------
@@ -89,17 +76,13 @@ export function CaseCreateEditForm() {
 
   const { user } = useAuthContext();
   //console.log("사건등록 화면 유저정보 :: " + JSON.stringify(user, null, 2));
-/*
- const [loading, setLoading] = useState(true);      // ← 로딩 상태
-  const [error, setError] = useState(null);          // ← 에러 상태
-*/
+
   // 공통코드 호출
   const { codes: largeClassOptions } = useCodes('LARGE_CLASS');
   const { codes: smallClassOptions } = useCodes('SMALL_CLASS');
   const { codes: courtLevelOptions } = useCodes('COURT_LEVEL');
-
   const { codes: userList } = useUsers(user?.companyCd);
-   console.log('userList 항목 :: ', JSON.stringify(userList, null, 2));
+
   const defaultValues = {
     large_class_cd: '',   // CR: 형사, CI: 민사, FA: 가사, AD: 행정
     small_class_cd: '',   // PR: 검찰, PO: 경찰, CO: 법원
@@ -180,7 +163,6 @@ export function CaseCreateEditForm() {
 
 */
   const {
-    reset,
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
