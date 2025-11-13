@@ -38,6 +38,7 @@ export function AuthSplitLayout({ sx, cssVars, children, slotProps, layoutQuery 
           <Logo />
         </>
       ),
+      
       rightArea: (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
           {/** @slot Help link */}
@@ -81,26 +82,13 @@ export function AuthSplitLayout({ sx, cssVars, children, slotProps, layoutQuery 
         ...(Array.isArray(slotProps?.main?.sx) ? slotProps.main.sx : [slotProps?.main?.sx]),
       ]}
     >
+
+      {/*
       <AuthSplitSection
         layoutQuery={layoutQuery}
         method={CONFIG.auth.method}
         {...slotProps?.section}
-        methods={[
-          {
-            label: 'Jwt',
-            path: paths.auth.jwt.signIn,
-            icon: `${CONFIG.assetsDir}/assets/icons/platforms/ic-jwt.svg`,
-          },
-          {
-            label: 'Firebase',
-            path: paths.auth.firebase.signIn,
-            icon: `${CONFIG.assetsDir}/assets/icons/platforms/ic-firebase.svg`,
-          },
-          {
-            label: 'Amplify',
-            path: paths.auth.amplify.signIn,
-            icon: `${CONFIG.assetsDir}/assets/icons/platforms/ic-amplify.svg`,
-          },
+        methods={[          
           {
             label: 'Auth0',
             path: paths.auth.auth0.signIn,
@@ -113,6 +101,7 @@ export function AuthSplitLayout({ sx, cssVars, children, slotProps, layoutQuery 
           },
         ]}
       />
+      */}
       <AuthSplitContent layoutQuery={layoutQuery} {...slotProps?.content}>
         {children}
       </AuthSplitContent>
