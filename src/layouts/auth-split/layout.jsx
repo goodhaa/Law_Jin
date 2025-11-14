@@ -83,25 +83,7 @@ export function AuthSplitLayout({ sx, cssVars, children, slotProps, layoutQuery 
       ]}
     >
 
-      {/*
-      <AuthSplitSection
-        layoutQuery={layoutQuery}
-        method={CONFIG.auth.method}
-        {...slotProps?.section}
-        methods={[          
-          {
-            label: 'Auth0',
-            path: paths.auth.auth0.signIn,
-            icon: `${CONFIG.assetsDir}/assets/icons/platforms/ic-auth0.svg`,
-          },
-          {
-            label: 'Supabase',
-            path: paths.auth.supabase.signIn,
-            icon: `${CONFIG.assetsDir}/assets/icons/platforms/ic-supabase.svg`,
-          },
-        ]}
-      />
-      */}
+     
       <AuthSplitContent layoutQuery={layoutQuery} {...slotProps?.content}>
         {children}
       </AuthSplitContent>
@@ -121,7 +103,7 @@ export function AuthSplitLayout({ sx, cssVars, children, slotProps, layoutQuery 
       /** **************************************
        * @Styles
        *************************************** */
-      cssVars={{ '--layout-auth-content-width': '420px', ...cssVars }}
+      cssVars={{ '--layout-auth-content-width': '920px', ...cssVars }}
       sx={sx}
     >
       {renderMain()}

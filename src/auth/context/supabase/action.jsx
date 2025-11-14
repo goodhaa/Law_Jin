@@ -75,7 +75,7 @@ export const resetPassword = async ({ email }) => {
   const supabase = getSupabaseBrowser();
 
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}${paths.auth.supabase.updatePassword}`,
+    redirectTo: `${window.location.origin}${paths.auth.updatePassword}`,
   });
 
   if (error) {

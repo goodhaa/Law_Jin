@@ -15,7 +15,7 @@ import { useAuthContext } from '../hooks';
 
 const signInPaths = {
   auth0: paths.auth.auth0.signIn,
-  supabase: paths.auth.supabase.signIn,
+  supabase: paths.auth.signIn,
 };
 
 export function AuthGuard({ children }) {

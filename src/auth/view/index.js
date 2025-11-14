@@ -13,3 +13,7 @@ export * from './companyPickerDialog';
 export * from './signUpChoiceView';
 
 export * from './signUpCompanyView';
+
+export * from './corpTermsView';
+
+export * from './userTermsView';

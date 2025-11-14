@@ -47,14 +47,16 @@ export const paths = {
   // AUTH
   auth: {
     auth0: { signIn: `${ROOTS.AUTH}/auth0/sign-in` },
-    supabase: {
-      signIn: `${ROOTS.AUTH}/supabase/sign-in`,
-      verify: `${ROOTS.AUTH}/supabase/verify`,
-      signUpChoice: `${ROOTS.AUTH}/supabase/sign-up-choice`,
-      signUp: `${ROOTS.AUTH}/supabase/sign-up`,
-      signUpCompany: `${ROOTS.AUTH}/supabase/sign-up-company`,
-      updatePassword: `${ROOTS.AUTH}/supabase/update-password`,
-      resetPassword: `${ROOTS.AUTH}/supabase/reset-password`,
+    signIn: `${ROOTS.AUTH}/signIn`,
+    verify: `${ROOTS.AUTH}/verify`,
+    signUpChoice: `${ROOTS.AUTH}/signUpChoice`,
+    signUp: `${ROOTS.AUTH}/signUp`,
+    signUpCompany: `${ROOTS.AUTH}/signUpCorp`,
+    updatePassword: `${ROOTS.AUTH}/updatePassword`,
+    resetPassword: `${ROOTS.AUTH}/reset-password`,
+    terms: {
+      userTerms: `${ROOTS.AUTH}/terms/userTerms`,
+      corpTerms: `${ROOTS.AUTH}/terms/corpTerms`,
     },
   },
   authDemo: {

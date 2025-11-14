@@ -47,7 +47,7 @@ export function SupabaseResetPasswordView() {
     try {
       await resetPassword({ email: data.email });
 
-      router.push(paths.auth.supabase.verify);
+      router.push(paths.auth.verify);
     } catch (error) {
       console.error(error);
     }
@@ -88,7 +88,7 @@ export function SupabaseResetPasswordView() {
         {renderForm()}
       </Form>
 
-      <FormReturnLink href={paths.auth.supabase.signIn} />
+      <FormReturnLink href={paths.auth.signIn} />
     </>
   );
 }

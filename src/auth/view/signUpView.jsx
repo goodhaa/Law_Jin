@@ -124,7 +124,7 @@ export function SupabaseSignUpView() {
         companyNm: data.company_nm,
       });
       
-      router.push(paths.auth.supabase.verify); // 회원가입 클릭후 이동할 화면페이지
+      router.push(paths.auth.verify); // 회원가입 클릭후 이동할 화면페이지
     } catch (error) {
       console.error(error);
       const feedbackMessage = getErrorMessage(error);
@@ -240,7 +240,7 @@ export function SupabaseSignUpView() {
         description={
           <>
             {`이미 계정이 있으신가요? `}
-            <Link component={RouterLink} href={paths.auth.supabase.signIn} variant="subtitle2">
+            <Link component={RouterLink} href={paths.auth.signIn} variant="subtitle2">
               로그인
             </Link>
           </>
