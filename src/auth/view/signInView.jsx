@@ -145,7 +145,7 @@ export function SupabaseSignInView() {
         description={
           <>
             {`처음 방문하셨나요? `}
-            <Link component={RouterLink} href={paths.auth.supabase.signUp} variant="subtitle2">
+            <Link component={RouterLink} href={paths.auth.supabase.signUpChoice} variant="subtitle2">
               회원 가입
             </Link>
           </>

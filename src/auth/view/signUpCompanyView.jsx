@@ -23,8 +23,12 @@ import { Form, Field, schemaUtils } from 'src/components/hook-form';
 import { getErrorMessage } from '../utils';
 import { signUp } from '../context/supabase';
 import { FormHead } from '../components/form-head';
-import { SignUpTerms } from '../components/sign-up-terms';
 import CompanyPickerDialog from './companyPickerDialog';
+import Stack from '@mui/material/Stack';
+import Card from '@mui/material/Card';
+import Divider from '@mui/material/Divider';
+import Typography from '@mui/material/Typography';
+
 // ----------------------------------------------------------------------
 
 export const SignUpSchema = z.object({
@@ -39,6 +43,9 @@ export const SignUpSchema = z.object({
     .min(1, { error: '비밀번호 확인을 입력하세요!' }),
   company_cd: z.string().min(1, { error: '회사코드를 입력하거나 검색에서 선택하세요!' }),
   company_nm: z.string().min(1, { error: '회사명을 입력하거나 검색에서 선택하세요!' }),  
+  // company_no: z.string().optional(),
+  // ceo_nm: z.string().optional(),
+  // tel_no: z.string().optional(),
 }).refine(
   (d) => {
     // 둘 다 비어있거나 하나라도 비어있으면 ‘일치’ 검사는 패스(= 에러 내지 않음)
@@ -51,7 +58,7 @@ export const SignUpSchema = z.object({
 
 // ----------------------------------------------------------------------
 
-export function SupabaseSignUpView() {
+export function SignUpCompanyView() {
   const router = useRouter();
 
   const showPassword = useBoolean();
@@ -139,87 +146,137 @@ export function SupabaseSignUpView() {
   };
 
   const renderForm = () => (
-    <Box sx={{ gap: 3, display: 'flex', flexDirection: 'column' }}>
-      <Box
-        sx={{ display: 'flex', gap: { xs: 3, sm: 2 }, flexDirection: { xs: 'column', sm: 'row' } }}
-      >
+  <Stack spacing={3}>
+    {/* ✅ 법무법인(회사) 정보 섹션 */}
+    <Card
+      sx={{
+        p: 3,
+        borderRadius: 2,
+      }}
+    >
+      <Typography variant="subtitle1" sx={{ mb: 2 }}>
+        법무법인 정보
+      </Typography>
+
+      <Stack spacing={2.5}>
+        {/* 숨겨진 회사코드 (DB용) */}
         <Field.Text
-          name="userName"
-          label="이름"
+          name="company_cd"
+          label="회사코드"
+          slotProps={{ inputLabel: { shrink: true } }}
+          sx={{ display: 'none' }}
+        />
+
+        <Field.Text
+          name="company_nm"
+          label="회사명"
+          slotProps={{
+            inputLabel: { shrink: true },
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={pickerOpen.onTrue} edge="end" aria-label="회사 검색">
+                    <Iconify icon="eva:search-fill" />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
+          placeholder="검색 버튼으로 선택하세요"
+        />
+
+        <Field.Text
+          name="company_no"
+          label="사업자등록번호"
           slotProps={{ inputLabel: { shrink: true } }}
         />
-      </Box>
 
-      {/* ✅ 회사코드 / 회사명 (검색 버튼으로 자동 기입) */}
-      <Field.Text
-        name="company_cd"
-        label="회사코드"
-        slotProps={{ inputLabel: { shrink: true } }}
-        sx={{ display: 'none' }}
-        // disabled  // 필요하면 수정 불가 처리
-      />
+        <Field.Text
+          name="ceo_nm"
+          label="대표자"
+          slotProps={{ inputLabel: { shrink: true } }}
+        />
 
-      <Field.Text
-        name="company_nm"
-        label="회사명"
-        slotProps={{
-          inputLabel: { shrink: true },
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={pickerOpen.onTrue} edge="end" aria-label="회사 검색">
-                  <Iconify icon="eva:search-fill" />
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
-        placeholder="검색 버튼으로 선택하세요"
-      />
+        <Field.Text
+          name="tel_no"
+          label="회사대표번호"
+          slotProps={{ inputLabel: { shrink: true } }}
+        />
+      </Stack>
+    </Card>
 
-      <Field.Text name="email" label="Email" slotProps={{ inputLabel: { shrink: true } }} />
+    {/* 구분선 */}
+    <Divider />
 
-      <Field.Text
-        name="password"
-        label="비밀번호"
-        //placeholder="6+ characters"
-        type={showPassword.value ? 'text' : 'password'}
-        slotProps={{
-          inputLabel: { shrink: true },
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={showPassword.onToggle} edge="end">
-                  <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
+    {/* ✅ 담당자(관리자) 정보 섹션 */}
+    <Card
+      sx={{
+        p: 3,
+        borderRadius: 2,
+      }}
+    >
+      <Typography variant="subtitle1" sx={{ mb: 2 }}>
+        담당자 정보
+      </Typography>
 
-      <Field.Text
-        name="passwordCheck"
-        label="비밀번호 확인"
-        type={showPassword.value ? 'text' : 'password'}
-        slotProps={{
-          inputLabel: { shrink: true },
-        }}
-      />
+      <Stack spacing={2.5}>
+        <Field.Text
+          name="userName"
+          label="담당자 이름"
+          slotProps={{ inputLabel: { shrink: true } }}
+        />
 
-      <Button
-        fullWidth
-        color="inherit"
-        size="large"
-        type="submit"
-        variant="contained"
-        loading={isSubmitting}
-        loadingIndicator="Create account..."
-      >
-        회원 가입
-      </Button>
-    </Box>
-  );
+        <Field.Text
+          name="email"
+          label="담당자 Email"
+          slotProps={{ inputLabel: { shrink: true } }}
+        />
+
+        <Field.Text
+          name="password"
+          label="비밀번호"
+          type={showPassword.value ? 'text' : 'password'}
+          slotProps={{
+            inputLabel: { shrink: true },
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={showPassword.onToggle} edge="end">
+                    <Iconify
+                      icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'}
+                    />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+
+        <Field.Text
+          name="passwordCheck"
+          label="비밀번호 확인"
+          type={showPassword.value ? 'text' : 'password'}
+          slotProps={{
+            inputLabel: { shrink: true },
+          }}
+        />
+
+        <Button
+          fullWidth
+          color="inherit"
+          size="large"
+          type="submit"
+          variant="contained"
+          loading={isSubmitting}
+          loadingIndicator="Create account..."
+          sx={{ mt: 1 }}
+        >
+          법무법인 회원 가입
+        </Button>
+      </Stack>
+    </Card>
+  </Stack>
+);
 
   return (
     <>

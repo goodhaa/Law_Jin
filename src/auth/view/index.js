@@ -9,3 +9,7 @@ export * from './resetPasswordView';
 export * from './updatePasswordView';
 
 export * from './companyPickerDialog';
+
+export * from './signUpChoiceView';
+
+export * from './signUpCompanyView';

@@ -77,4 +77,7 @@ export const endpoints = {
     details: '/api/product/details',
     search: '/api/product/search',
   },
+  biz: {
+    validate: '/api/biz/validate',  // ⬅ 추가
+  },
 };

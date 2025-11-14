@@ -17,6 +17,7 @@ import { Footer, HomeFooter } from './footer';
 import { MenuButton } from '../components/menu-button';
 import { navData as mainNavData } from '../nav-config-main';
 import { SignInButton } from '../components/sign-in-button';
+import { SignUpButton } from '../components/signUpButton';
 import { SettingsButton } from '../components/settings-button';
 import { MainSection, LayoutSection, HeaderSection } from '../core';
 
@@ -73,6 +74,8 @@ export function MainLayout({ sx, cssVars, children, slotProps, layoutQuery = 'md
             {/** @slot 로그인 버튼 */}
             <SignInButton />
 
+            {/** @slot 회원가입 버튼 */}
+            <SignUpButton />
             {/** @slot Purchase button */}
             {/** 
             <Button

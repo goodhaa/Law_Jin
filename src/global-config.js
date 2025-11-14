@@ -18,6 +18,7 @@ export const CONFIG = {
     method: 'supabase',
     skip: false,
     redirectPath: paths.dashboard.root,
+    signUpChoice: paths.auth.supabase.signUpChoice,
   },
   /**
    * Firebase
