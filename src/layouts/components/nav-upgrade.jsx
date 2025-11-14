@@ -10,12 +10,12 @@ import { CONFIG } from 'src/global-config';
 
 import { Label } from 'src/components/label';
 
-import { useMockedUser } from 'src/auth/hooks';
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
 export function NavUpgrade({ sx, ...other }) {
-  const { user } = useMockedUser();
+  const { user } = useAuthContext();
 
   return (
     <Box
@@ -64,17 +64,7 @@ export function NavUpgrade({ sx, ...other }) {
             {user?.email}
           </Typography>
         </Box>
-
-        {/*    
-        <Button
-          variant="contained"
-          href={paths.minimalStore}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Upgrade to Pro
-        </Button>
-        */}
+ 
       </Box>
     </Box>
   );

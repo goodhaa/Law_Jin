@@ -4,7 +4,7 @@ import { SupabaseUpdatePasswordView } from 'src/auth/view';
 
 // ----------------------------------------------------------------------
 
-export const metadata = { title: `Update password | Supabase - ${CONFIG.appName}` };
+export const metadata = { title: `패스워드 변경 - ${CONFIG.appName}` };
 
 export default function Page() {
   return <SupabaseUpdatePasswordView />;

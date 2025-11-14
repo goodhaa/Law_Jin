@@ -70,7 +70,7 @@ const DEMO_COMPONENTS = [
                 icon: <Iconify icon="solar:home-angle-bold-duotone" />,
               },
               { name: 'Link1', href: '#', icon: <Iconify icon="solar:box-minimalistic-bold" /> },
-              { name: 'Link2', href: '#', icon: <Iconify icon="solar:box-minimalistic-bold" /> },
+              { name: 'Link2', href: '#', icon: <Iconify icon="solar:box-istic-bold" /> },
               { name: 'Link3', icon: <Iconify icon="solar:box-minimalistic-bold" /> },
             ]}
           />

@@ -3,9 +3,9 @@ import { HomeView } from 'src/sections/home/view';
 // ----------------------------------------------------------------------
 
 export const metadata = {
-  title: 'Minimals UI: The starting point for your next project',
+  title: 'JinLaw ERP Platform',
   description:
-    'The starting point for your next project with Minimal UI Kit, built on the newest version of Material-UI ©, ready to be customized to your style',
+    '법무 업무를 더 쉽고 빠르게. 직관적인 UI와 강력한 기능으로 법무팀의 생산성을 높여주는 ERP 플랫폼',
 };
 
 export default function Page() {

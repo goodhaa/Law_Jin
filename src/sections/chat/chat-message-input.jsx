@@ -27,7 +27,7 @@ export function ChatMessageInput({
 }) {
   const router = useRouter();
 
-  const { user } = useMockedUser();
+  co();
 
   const fileRef = useRef(null);
 

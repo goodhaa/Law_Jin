@@ -7,12 +7,19 @@ import { Iconify } from 'src/components/iconify';
 // ----------------------------------------------------------------------
 
 export const navData = [
-  { title: 'Home', path: '/', icon: <Iconify width={22} icon="solar:home-angle-bold-duotone" /> },
+  { title: '회사 소개', path: paths.about, icon: <Iconify width={22} icon="solar:home-angle-bold-duotone" /> },
   {
-    title: 'Components',
-    path: paths.components,
+    title: '공지사항',
+    path: paths.payment,
     icon: <Iconify width={22} icon="solar:atom-bold-duotone" />,
   },
+  {
+    title: '자주 묻는 질문',
+    path: paths.faqs,
+    icon: <Iconify width={22} icon="solar:atom-bold-duotone" />,
+  },
+  
+  /*
   {
     title: 'Pages',
     path: '/pages',
@@ -66,8 +73,9 @@ export const navData = [
       { subheader: 'Dashboard', items: [{ title: 'Dashboard', path: CONFIG.auth.redirectPath }] },
     ],
   },
+  */
   {
-    title: 'Docs',
+    title: '고객센터',
     icon: <Iconify width={22} icon="solar:notebook-bold-duotone" />,
     path: paths.docs,
   },

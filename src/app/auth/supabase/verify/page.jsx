@@ -4,7 +4,7 @@ import { SupabaseVerifyView } from 'src/auth/view';
 
 // ----------------------------------------------------------------------
 
-export const metadata = { title: `Verify | Supabase - ${CONFIG.appName}` };
+export const metadata = { title: `가입 확인 - ${CONFIG.appName}` };
 
 export default function Page() {
   return <SupabaseVerifyView />;

@@ -4,7 +4,7 @@ import { SupabaseSignUpView } from 'src/auth/view';
 
 // ----------------------------------------------------------------------
 
-export const metadata = { title: `Sign up | Supabase - ${CONFIG.appName}` };
+export const metadata = { title: `회원가입 - ${CONFIG.appName}` };
 
 export default function Page() {
   return <SupabaseSignUpView />;

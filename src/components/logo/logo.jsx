@@ -9,7 +9,7 @@ import { styled, useTheme } from '@mui/material/styles';
 import { RouterLink } from 'src/routes/components';
 
 import { logoClasses } from './classes';
-
+import { CONFIG } from 'src/global-config';
 // ----------------------------------------------------------------------
 
 export function Logo({ sx, disabled, className, href = '/', isSingle = true, ...other }) {
@@ -24,7 +24,7 @@ export function Logo({ sx, disabled, className, href = '/', isSingle = true, ...
 
   /*
     * OR using local (public folder)
-    *
+    */
     const singleLogo = (
       <img
         alt="Single logo"
@@ -33,7 +33,7 @@ export function Logo({ sx, disabled, className, href = '/', isSingle = true, ...
         height="100%"
       />
     );
-
+/*
     const fullLogo = (
       <img
         alt="Full logo"
@@ -44,7 +44,7 @@ export function Logo({ sx, disabled, className, href = '/', isSingle = true, ...
     );
     *
     */
-
+/*
   const singleLogo = (
     <svg
       width="100%"
@@ -106,7 +106,7 @@ export function Logo({ sx, disabled, className, href = '/', isSingle = true, ...
       />
     </svg>
   );
-
+*/
   const fullLogo = (
     <svg
       width="100%"
